@@ -1,20 +1,21 @@
 
-package chess;
+package player;
 
 import java.util.ArrayList;
+
+import chess.Color;
+import myexceptions.InvalidPositionException;
 import pieces.Piece;
 
 
-public class Player {
+public abstract class Player {
     
-    private String name;
-    private boolean mashine;
-    private Color color;
-    private ArrayList<Piece> pieces;
+    protected String name;
+    protected Color color;
+    protected ArrayList<Piece> pieces;
     
-    public Player(String name, boolean mashine, Color color) {
+    protected Player(String name, Color color) {
         this.name = name;
-        this.mashine = mashine;
         this.color = color;
         this.pieces = new ArrayList<>();
     }
@@ -30,4 +31,5 @@ public class Player {
     public void removePiece(int index) {
         this.pieces.remove(index);
     }
+
 }

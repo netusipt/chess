@@ -11,17 +11,21 @@ public abstract class Piece {
     protected String name;
 
     protected ArrayList<Vector> directions;
-    protected ArrayList<Vector> suroundVectors;
+    protected ArrayList<Vector> surroundVectors;
 
-    public Piece(int x, int y) throws InvalidPositionException {
-        this.position = new Position(x, y);
+    /**
+     *
+     * @param position
+     * @throws InvalidPositionException
+     */
+    public Piece(Position position) throws InvalidPositionException {
+        this.position = position;
         this.directions = new ArrayList<>();
-        this.suroundVectors = new ArrayList<>(); //TODO: rename
+        this.surroundVectors = new ArrayList<>(); //TODO: rename
     }
     
-    public void setPosition(int x, int y) throws InvalidPositionException {
-        this.position.setX(x);
-        this.position.setY(y);
+    public void setPosition(Position position) throws InvalidPositionException {
+        this.position = position;
     }
 
     public abstract ArrayList<Position> getPossibleMoves() throws InvalidPositionException;
@@ -36,17 +40,17 @@ public abstract class Piece {
         return positions;
     }
 
-    protected ArrayList<Position> getSuroundings() throws InvalidPositionException {
+    protected ArrayList<Position> getSurrounding() throws InvalidPositionException {
         ArrayList<Position> positions = new ArrayList<>();
 
-        for (Vector suroundVector : this.suroundVectors) {
+        for (Vector surroundVector : this.surroundVectors) {
             positions.add(new Position(
-                   this.position.getX() + suroundVector.getX(),
-                   this.position.getY() + suroundVector.getY()
+                   this.position.getX() + surroundVector.getX(),
+                   this.position.getY() + surroundVector.getY()
             ));
             positions.add(new Position(
-                   this.position.getX() - suroundVector.getX(),
-                   this.position.getY() - suroundVector.getY()
+                   this.position.getX() - surroundVector.getX(),
+                   this.position.getY() - surroundVector.getY()
             ));
         }
         

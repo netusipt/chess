@@ -13,10 +13,10 @@ public class Knight extends Piece {
     public Knight(int x, int y) throws InvalidPositionException {
         super(x, y);
         
-        this.suroundVectors.add(new Vector(1, 2));
-        this.suroundVectors.add(new Vector(2, 1));
-        this.suroundVectors.add(new Vector(-2, 1));
-        this.suroundVectors.add(new Vector(-1, 2));
+        this.surroundVectors.add(new Vector(1, 2));
+        this.surroundVectors.add(new Vector(2, 1));
+        this.surroundVectors.add(new Vector(-2, 1));
+        this.surroundVectors.add(new Vector(-1, 2));
     }
     
     @Override
@@ -26,7 +26,7 @@ public class Knight extends Piece {
     
     @Override
     public ArrayList<Position> getPossibleMoves() throws InvalidPositionException {
-        return this.getSuroundings();
+        return this.getSurrounding();
     }
     
 }

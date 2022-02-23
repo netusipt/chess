@@ -20,7 +20,7 @@ public class Pawn extends Piece {
     
     @Override
     public ArrayList<Position> getPossibleMoves() throws InvalidPositionException {
-        return this.getSuroundings();
+        return this.getSurrounding();
     }
     
 }

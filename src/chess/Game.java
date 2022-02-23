@@ -1,6 +1,7 @@
 
 package chess;
 
+import player.Player;
 import myexceptions.InvalidPositionException;
 import pieces.impl.Bishop;
 import pieces.impl.King;
@@ -21,12 +22,13 @@ public class Game {
         this.player2 = player2;
         this.boardSetup();
     }
-    
+
+
     private void boardSetup() throws InvalidPositionException {
         this.playerSetup(player1);
         this.playerSetup(player2);
     }
-    
+
     private void playerSetup(Player player) throws InvalidPositionException {
         
         int firstRow, secondRow, kingColum, queenColum;

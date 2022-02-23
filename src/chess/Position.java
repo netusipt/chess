@@ -2,6 +2,8 @@ package chess;
 
 import myexceptions.InvalidPositionException;
 
+import java.util.Random;
+
 public class Position {
     
     public static final int MAX = 7;
