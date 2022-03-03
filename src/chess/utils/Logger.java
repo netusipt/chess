@@ -1,5 +1,5 @@
 
-package utils;
+package chess.utils;
 
 
 public class Logger {

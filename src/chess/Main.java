@@ -1,10 +1,8 @@
-
 package chess;
 
-import gui.Table;
+import chess.gui.Table;
 
-public class Chess {
-
+public class Main {
 
     public static void main(String[] args) {
         Table table = new Table();

@@ -1,10 +1,10 @@
 
-package pieces.impl;
+package chess.game.pieces.impl;
 
-import chess.Position;
+import chess.game.base.Position;
 import java.util.ArrayList;
-import myexceptions.InvalidPositionException;
-import pieces.Piece;
+import chess.exceptions.InvalidPositionException;
+import chess.game.pieces.Piece;
 
 
 public class Pawn extends Piece {

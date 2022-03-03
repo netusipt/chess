@@ -1,7 +1,7 @@
 
-package chess;
+package chess.game.base;
 
-import pieces.Piece;
+import chess.game.pieces.Piece;
 
 public class Move {
     

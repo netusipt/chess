@@ -1,5 +1,5 @@
 
-package gui;
+package chess.gui;
 
 import java.awt.Graphics;
 import javax.swing.ImageIcon;

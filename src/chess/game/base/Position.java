@@ -1,8 +1,6 @@
-package chess;
+package chess.game.base;
 
-import myexceptions.InvalidPositionException;
-
-import java.util.Random;
+import chess.exceptions.InvalidPositionException;
 
 public class Position {
     

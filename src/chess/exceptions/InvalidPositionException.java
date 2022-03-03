@@ -1,5 +1,5 @@
 
-package myexceptions;
+package chess.exceptions;
 
 
 public class InvalidPositionException extends Exception {

@@ -1,11 +1,9 @@
 
-package player;
+package chess.game.player;
 
 import java.util.ArrayList;
 
-import chess.Color;
-import myexceptions.InvalidPositionException;
-import pieces.Piece;
+import chess.game.pieces.Piece;
 
 
 public abstract class Player {

@@ -1,10 +1,10 @@
-package player.impl;
+package chess.game.player.impl;
 
-import chess.Color;
-import chess.Move;
-import chess.Position;
-import myexceptions.InvalidPositionException;
-import player.Player;
+import chess.game.player.Color;
+import chess.game.base.Move;
+import chess.game.base.Position;
+import chess.exceptions.InvalidPositionException;
+import chess.game.player.Player;
 
 public class HumanPlayer extends Player {
 

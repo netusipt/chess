@@ -1,14 +1,15 @@
 
-package chess;
+package chess.game;
 
-import player.Player;
-import myexceptions.InvalidPositionException;
-import pieces.impl.Bishop;
-import pieces.impl.King;
-import pieces.impl.Knight;
-import pieces.impl.Pawn;
-import pieces.impl.Queen;
-import pieces.impl.Rook;
+import chess.game.player.Color;
+import chess.game.player.Player;
+import chess.exceptions.InvalidPositionException;
+import chess.game.pieces.impl.Bishop;
+import chess.game.pieces.impl.King;
+import chess.game.pieces.impl.Knight;
+import chess.game.pieces.impl.Pawn;
+import chess.game.pieces.impl.Queen;
+import chess.game.pieces.impl.Rook;
 
 
 public class Game {

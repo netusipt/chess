@@ -1,7 +1,8 @@
-package chess;
+package chess.game.base;
 
 import java.util.ArrayList;
-import myexceptions.InvalidPositionException;
+
+import chess.exceptions.InvalidPositionException;
 
 public class Vector {
 

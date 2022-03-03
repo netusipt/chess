@@ -1,5 +1,5 @@
 
-package chess;
+package chess.game.player;
 
 
 public enum Color {
