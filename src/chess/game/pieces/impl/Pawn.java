@@ -6,11 +6,10 @@ import java.util.ArrayList;
 import chess.exceptions.InvalidPositionException;
 import chess.game.pieces.Piece;
 
-
 public class Pawn extends Piece {
     
-    public Pawn(int x, int y) throws InvalidPositionException {
-        super(x, y);
+    public Pawn(Position position) throws InvalidPositionException {
+        super(position);
     }
     
     @Override

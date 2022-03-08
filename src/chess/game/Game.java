@@ -1,6 +1,7 @@
 
 package chess.game;
 
+import chess.game.base.Position;
 import chess.game.player.Color;
 import chess.game.player.Player;
 import chess.exceptions.InvalidPositionException;
@@ -10,18 +11,40 @@ import chess.game.pieces.impl.Knight;
 import chess.game.pieces.impl.Pawn;
 import chess.game.pieces.impl.Queen;
 import chess.game.pieces.impl.Rook;
+import chess.game.player.impl.ComputerPlayer;
+import chess.game.player.impl.HumanPlayer;
 
 
 public class Game {
-    
-    private int round;
+
     private Player player1;
     private Player player2;
+    private int round;
     
-    public Game(Player player1, Player player2) throws InvalidPositionException {
-        this.player1 = player1;
-        this.player2 = player2;
-        this.boardSetup();
+    public Game(String playerName) {
+
+        //TODO: set random player color
+        this.player1 = new HumanPlayer(playerName, Color.WHITE);
+        this.player2 = new ComputerPlayer("Computer", Color.BLACK);
+
+        try {
+            this.boardSetup();
+        } catch (InvalidPositionException e) {
+            System.err.println("Bord is not setup properly! " + e.getMessage());
+        }
+    }
+
+    public Game(String player1Name, String player2Name) {
+
+        //TODO: set random player color
+        this.player1 = new HumanPlayer(player1Name, Color.WHITE);
+        this.player2 = new HumanPlayer(player2Name, Color.BLACK);
+
+        try {
+            this.boardSetup();
+        } catch (InvalidPositionException e) {
+            System.err.println("Bord is not setup properly! " + e.getMessage());
+        }
     }
 
 
@@ -46,17 +69,17 @@ public class Game {
             queenColum = 4;
         }
         
-        player.addPiece(new Rook(7, firstRow));
-        player.addPiece(new Knight(6, firstRow));
-        player.addPiece(new Bishop(5, firstRow));
-        player.addPiece(new King(kingColum, firstRow));
-        player.addPiece(new Queen(queenColum, firstRow));
-        player.addPiece(new Bishop(2, firstRow));
-        player.addPiece(new Knight(1, firstRow));
-        player.addPiece(new Rook(0, firstRow));
+        player.addPiece(new Rook(new Position(7, firstRow)));
+        player.addPiece(new Knight(new Position(6, firstRow)));
+        player.addPiece(new Bishop(new Position(5, firstRow)));
+        player.addPiece(new King(new Position(kingColum, firstRow)));
+        player.addPiece(new Queen(new Position(queenColum, firstRow)));
+        player.addPiece(new Bishop(new Position(2, firstRow)));
+        player.addPiece(new Knight(new Position(1, firstRow)));
+        player.addPiece(new Rook(new Position(0, firstRow)));
         
         for (int i = 0; i < 8; i++) {
-            player.addPiece(new Pawn(i, secondRow));
+            player.addPiece(new Pawn(new Position(i, secondRow)));
         }
     }
     

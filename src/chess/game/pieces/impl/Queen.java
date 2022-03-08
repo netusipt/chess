@@ -10,8 +10,8 @@ import chess.game.pieces.Piece;
 
 public class Queen extends Piece {
     
-    public Queen(int x, int y) throws InvalidPositionException {
-        super(x, y);
+    public Queen(Position position) throws InvalidPositionException {
+        super(position);
         
         this.directions.add(new Vector(1, 0));
         this.directions.add(new Vector(0, 1));

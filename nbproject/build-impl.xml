@@ -19,7 +19,7 @@ is divided into following sections:
   - cleanup
 
         -->
-<project xmlns:j2seproject1="http://www.netbeans.org/ns/j2se-project/1" xmlns:j2seproject3="http://www.netbeans.org/ns/j2se-project/3" xmlns:jaxrpc="http://www.netbeans.org/ns/j2se-project/jax-rpc" basedir=".." default="default" name="Chess-chess.game.player.impl">
+<project xmlns:j2seproject1="http://www.netbeans.org/ns/j2se-project/1" xmlns:j2seproject3="http://www.netbeans.org/ns/j2se-project/3" xmlns:jaxrpc="http://www.netbeans.org/ns/j2se-project/jax-rpc" basedir=".." default="default" name="Chess-main.chess.game.player.impl">
     <fail message="Please build using Ant 1.8.0 or higher.">
         <condition>
             <not>
@@ -461,8 +461,8 @@ is divided into following sections:
             </sequential>
         </macrodef>
     </target>
-    <target name="-init-macrodef-test-chess.game.player.impl">
-        <macrodef name="test-chess.game.player.impl" uri="http://www.netbeans.org/ns/j2se-project/3">
+    <target name="-init-macrodef-test-main.chess.game.player.impl">
+        <macrodef name="test-main.chess.game.player.impl" uri="http://www.netbeans.org/ns/j2se-project/3">
             <attribute default="${includes}" name="includes"/>
             <attribute default="${excludes}" name="excludes"/>
             <attribute default="**" name="testincludes"/>
@@ -473,8 +473,8 @@ is divided into following sections:
             </sequential>
         </macrodef>
     </target>
-    <target depends="-init-macrodef-junit" if="${junit.available}" name="-init-macrodef-junit-chess.game.player.impl">
-        <macrodef name="test-chess.game.player.impl" uri="http://www.netbeans.org/ns/j2se-project/3">
+    <target depends="-init-macrodef-junit" if="${junit.available}" name="-init-macrodef-junit-main.chess.game.player.impl">
+        <macrodef name="test-main.chess.game.player.impl" uri="http://www.netbeans.org/ns/j2se-project/3">
             <attribute default="${includes}" name="includes"/>
             <attribute default="${excludes}" name="excludes"/>
             <attribute default="**" name="testincludes"/>
@@ -487,8 +487,8 @@ is divided into following sections:
             </sequential>
         </macrodef>
     </target>
-    <target depends="-init-macrodef-testng" if="${testng.available}" name="-init-macrodef-testng-chess.game.player.impl">
-        <macrodef name="test-chess.game.player.impl" uri="http://www.netbeans.org/ns/j2se-project/3">
+    <target depends="-init-macrodef-testng" if="${testng.available}" name="-init-macrodef-testng-main.chess.game.player.impl">
+        <macrodef name="test-main.chess.game.player.impl" uri="http://www.netbeans.org/ns/j2se-project/3">
             <attribute default="${includes}" name="includes"/>
             <attribute default="${excludes}" name="excludes"/>
             <attribute default="**" name="testincludes"/>
@@ -578,8 +578,8 @@ is divided into following sections:
             </sequential>
         </macrodef>
     </target>
-    <target depends="-init-macrodef-junit-debug,-init-macrodef-junit-debug-batch" if="${junit.available}" name="-init-macrodef-junit-debug-chess.game.player.impl">
-        <macrodef name="test-debug-chess.game.player.impl" uri="http://www.netbeans.org/ns/j2se-project/3">
+    <target depends="-init-macrodef-junit-debug,-init-macrodef-junit-debug-batch" if="${junit.available}" name="-init-macrodef-junit-debug-main.chess.game.player.impl">
+        <macrodef name="test-debug-main.chess.game.player.impl" uri="http://www.netbeans.org/ns/j2se-project/3">
             <attribute default="${includes}" name="includes"/>
             <attribute default="${excludes}" name="excludes"/>
             <attribute default="**" name="testincludes"/>
@@ -619,8 +619,8 @@ is divided into following sections:
             </sequential>
         </macrodef>
     </target>
-    <target depends="-init-macrodef-testng-debug" if="${testng.available}" name="-init-macrodef-testng-debug-chess.game.player.impl">
-        <macrodef name="testng-debug-chess.game.player.impl" uri="http://www.netbeans.org/ns/j2se-project/3">
+    <target depends="-init-macrodef-testng-debug" if="${testng.available}" name="-init-macrodef-testng-debug-main.chess.game.player.impl">
+        <macrodef name="testng-debug-main.chess.game.player.impl" uri="http://www.netbeans.org/ns/j2se-project/3">
             <attribute default="${main.class}" name="testClass"/>
             <attribute default="" name="testMethod"/>
             <element implicit="true" name="customize2" optional="true"/>
@@ -980,7 +980,7 @@ is divided into following sections:
     </target>
     <target depends="init,-do-jar-create-manifest,-do-jar-copy-manifest" if="do.archive+main.class.available" name="-do-jar-set-mainclass">
         <manifest encoding="UTF-8" file="${tmp.manifest.file}" mode="update">
-            <attribute name="chess.Main-Class" value="${main.class}"/>
+            <attribute name="main.chess.chess.Main-Class" value="${main.class}"/>
         </manifest>
     </target>
     <target depends="init,-do-jar-create-manifest,-do-jar-copy-manifest" if="do.archive+profile.available" name="-do-jar-set-profile">

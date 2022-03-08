@@ -10,8 +10,8 @@ import chess.game.pieces.Piece;
 
 public class Bishop extends Piece {
     
-    public Bishop(int x, int y) throws InvalidPositionException {
-        super(x, y);
+    public Bishop(Position position) throws InvalidPositionException {
+        super(position);
         
         this.directions.add(new Vector(1, 1));
         this.directions.add(new Vector(-1, 1));

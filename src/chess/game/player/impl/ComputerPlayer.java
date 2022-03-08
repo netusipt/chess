@@ -1,11 +1,11 @@
 package chess.game.player.impl;
 
 import chess.game.player.Color;
+import chess.game.player.Player;
 import chess.game.base.Move;
 import chess.game.base.Position;
 import chess.exceptions.InvalidPositionException;
 import chess.game.pieces.Piece;
-import chess.game.player.Player;
 
 import java.util.Random;
 

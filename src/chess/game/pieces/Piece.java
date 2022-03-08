@@ -1,9 +1,9 @@
 package chess.game.pieces;
 
+import chess.exceptions.InvalidPositionException;
 import chess.game.base.Position;
 import chess.game.base.Vector;
 import java.util.ArrayList;
-import chess.exceptions.InvalidPositionException;
 
 public abstract class Piece {
 
