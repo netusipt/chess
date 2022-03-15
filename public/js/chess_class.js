@@ -1,7 +1,36 @@
 let canvas = document.querySelector("#board");
 let context = canvas.getContext("2d");
-
 const SQ_LEN = canvas.width / 8;
+
+class Piece {
+    posX
+    posY
+}
+
+class Board {
+
+    static width = 8;
+    static height = 8;
+
+    drawBoard() {
+        for (let i = 0; i < height; i++) {
+            for (let j = 0; j < width; j++) {
+                if ((i + j) % 2 == 0) {
+                    context.fillStyle = "rgb(238, 238, 210)";
+                } else {
+                    context.fillStyle = "rgb(119, 149, 86)";
+                }
+                context.fillRect(SQ_LEN * j, SQ_LEN * i, SQ_LEN, SQ_LEN);
+            }
+        }
+    }
+}
+
+let board = new Board();
+
+
+
+
 
 let pieces = [];
 let drag = false;
@@ -10,28 +39,13 @@ let focusedPieceId;
 let curX;
 let curY;
 
-let firstMove = true;
 
 
-function drawBoard() {
-    for (let i = 0; i < 8; i++) {
-        for (let j = 0; j < 8; j++) {
-            if ((i + j) % 2 == 0) {
-                context.fillStyle = "rgb(238, 238, 210)";
-            } else {
-                context.fillStyle = "rgb(119, 149, 86)";
-            }
-            context.fillRect(SQ_LEN * j, SQ_LEN * i, SQ_LEN, SQ_LEN);
-        }
-    }
-}
 
 function drawPieces() {
-    pieces.forEach(piece => {
-        if (piece.busy == false) {
-            drawPiece(piece.pieceImg, piece.posX * SQ_LEN, piece.posY * SQ_LEN);
-        }
-    });
+    for (let i = 0; i < pieces.length; i++) {
+        drawPiece(pieces[i].pieceImg, pieces[i].posX * SQ_LEN, pieces[i].posY * SQ_LEN);
+    }
 }
 
 function putPiecesOnBoard() {
@@ -67,7 +81,7 @@ function putPiecesOnBoard() {
 function createPiece(pieceId, x, y) {
     let pieceImg = new Image();
     pieceImg.src = "data/" + pieceId + ".png";
-    pieces.push({ pieceId: pieceId, pieceImg: pieceImg, posX: x, posY: y, busy: false });
+    pieces.push({ pieceId: pieceId, pieceImg: pieceImg, posX: x, posY: y });
 }
 
 function drawPiece(pieceImg, x, y) {
@@ -85,9 +99,9 @@ canvas.addEventListener("mousedown", function(event) {
             event.offsetY >= pieces[id].posY * SQ_LEN &&
             event.offsetY <= pieces[id].posY * SQ_LEN + SQ_LEN
         ) {
+            console.log("down", pieces[id].pieceId, pieces[id].posX, pieces[id].posY);
             drag = true;
             focusedPieceId = id;
-            pieces[id].busy = true;
         }
     }
     drag = true;
@@ -100,23 +114,20 @@ canvas.addEventListener("mousemove", function(event) {
 })
 
 canvas.addEventListener("mouseup", function(event) {
+    console.log("up", event.offsetX, event.offsetY);
     pieces[focusedPieceId].posX = Math.round((curX - SQ_LEN / 2) / SQ_LEN);
     pieces[focusedPieceId].posY = Math.round((curY - SQ_LEN / 2) / SQ_LEN);
-    pieces[focusedPieceId].busy = false;
     drawBoard();
     drawPieces();
+    drawPiece(pieces[focusedPieceId].pieceImg, pieces[focusedPieceId].x, pieces[focusedPieceId].y);
     drag = false;
-    if (firstMove) {
-        playSound("game_start");
-        firstMove = false;
-    } else {
-        playSound("move");
-    }
-
 });
+
+
 
 function update() {
     if (drag) {
+        console.log("fdsfsdf");
         drawBoard();
         drawPieces();
         drawPiece(pieces[focusedPieceId].pieceImg, curX - SQ_LEN / 2, curY - SQ_LEN / 2);
@@ -125,42 +136,18 @@ function update() {
     }
 }
 
-function socketCreate() {
-    let socket = new WebSocket("ws://172.24.96.1:3030");
-
-    socket.addEventListener('error', function(event) {
-        console.log('WebSocket error: ', event);
-    });
-
-    socket.onopen = () => {
-        socket.send("Hello world!");
-    }
-}
-
-function playSound(type) {
-    let sound;
-    switch (type) {
-        case "game_start":
-            sound = new Audio("data/audio/game_start.mp3");
-            break;
-        case "move":
-            sound = new Audio("data/audio/move.mp3");
-            break;
-        case "castling":
-            sound = new Audio("data/audio/castling.mp3");
-            break;
-        case "capture":
-            sound = new Audio("data/audio/capture.mp3");
-            break;
-        case "check":
-            sound = new Audio("data/audio/check.mp3");
-            break;
-        case "game_over":
-            sound = new Audio("data/audio/game_over.mp3");
-            break;
-    }
-    sound.play();
-}
-
 drawBoard();
 putPiecesOnBoard();
+
+let socket = new WebSocket("ws://172.24.96.1:3030");
+
+socket.addEventListener('error', function(event) {
+    console.log('WebSocket error: ', event);
+});
+
+socket.onopen = () => {
+    socket.send("Hello world!");
+}
+
+
+console.log(pieces);
