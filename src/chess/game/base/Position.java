@@ -34,7 +34,7 @@ public class Position {
         if (x >= this.MIN && x <= this.MAX) {
             this.x = x;
         } else {
-            throw new InvalidPositionException("X cordinnate is out of range (0-7)");
+            throw new InvalidPositionException("X coordinate is out of range (0-7)");
         }
     }
 
@@ -42,7 +42,7 @@ public class Position {
         if (y >= this.MIN && y <= this.MAX) {
             this.y = y;
         } else {
-            throw new InvalidPositionException("Y cordinate is out of range (0-7)");
+            throw new InvalidPositionException("Y coordinate is out of range (0-7)");
         }
     }
 

@@ -1,6 +1,8 @@
 
 package chess.game;
 
+import chess.comunication.dto.request.client.game.MoveRequest;
+import chess.exceptions.InvalidMoveException;
 import chess.game.base.Position;
 import chess.game.player.Color;
 import chess.game.player.Player;
@@ -19,6 +21,7 @@ public class Game {
 
     private Player player1;
     private Player player2;
+    private Referee referee;
     private int round;
     
     public Game(String playerName) {
@@ -26,6 +29,8 @@ public class Game {
         //TODO: set random player color
         this.player1 = new HumanPlayer(playerName, Color.WHITE);
         this.player2 = new ComputerPlayer("Computer", Color.BLACK);
+
+        this.referee = new Referee(this.player1, this.player2);
 
         try {
             this.boardSetup();
@@ -40,10 +45,21 @@ public class Game {
         this.player1 = new HumanPlayer(player1Name, Color.WHITE);
         this.player2 = new HumanPlayer(player2Name, Color.BLACK);
 
+        this.referee = new Referee(this.player1, this.player2);
+
         try {
             this.boardSetup();
         } catch (InvalidPositionException e) {
             System.err.println("Bord is not setup properly! " + e.getMessage());
+        }
+    }
+
+    public void updateBoard(MoveRequest move) throws InvalidMoveException {
+        //TODO
+        if(this.referee.isMovePermitted(move)) {
+
+        } else {
+
         }
     }
 

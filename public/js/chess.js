@@ -126,7 +126,7 @@ function update() {
 }
 
 function socketCreate() {
-    let socket = new WebSocket("ws://172.24.96.1:3030");
+    let socket = new WebSocket("ws://localhost:80");
 
     socket.addEventListener('error', function(event) {
         console.log('WebSocket error: ', event);
@@ -135,32 +135,75 @@ function socketCreate() {
     socket.onopen = () => {
         socket.send("Hello world!");
     }
+
+    socket.onmessage = (e) => {
+        console.log("message from server", e.data);
+    }
+
+    // setTimeout(() => {
+    //     socket.close();
+    //     console.log("Socket closed!")
+    // }, 3000);
+}
+
+function handleMessage(message) {
+    switch (message.type) {
+        case "game_start":
+            playSound("game_start");
+            break;
+        case "opponent_moved":
+            highlightPosition(pieces[message.pieceId].posX, pieces[message.pieceId].posY);
+            pieces[message.pieceId].posX = message.x;
+            pieces[message.pieceId].posY = message.y;
+            highlightPosition(x, y);
+
+            if (message.check) {
+                playSound("check");
+            } else if (message.castling) {
+                playSound("castling")
+            } else {
+                playSound("move");
+            }
+            break;
+        case "game_over":
+            playSound("game_over");
+            break;
+    }
+}
+
+
+//TODO
+function highlightPosition(x, y) {
+
+}
+
+function markPosibleMoves(posibleMoves) {
+    for (let i = 0; i < posibleMoves.length; i++) {
+        markPossibleMove(posibleMoves[i]);
+    }
+}
+
+//TODO
+function markPossibleMove(possition) {
+
+}
+
+let sounds = [];
+
+function loadSounds() {
+    sounds["game_start"] = new Audio("data/audio/game_start.mp3");
+    sounds["move"] = new Audio("data/audio/move.mp3");
+    sounds["castling"] = new Audio("data/audio/castling.mp3");
+    sounds["check"] = new Audio("data/audio/check.mp3");
+    sounds["game_over"] = new Audio("data/audio/game_over.mp3");
 }
 
 function playSound(type) {
-    let sound;
-    switch (type) {
-        case "game_start":
-            sound = new Audio("data/audio/game_start.mp3");
-            break;
-        case "move":
-            sound = new Audio("data/audio/move.mp3");
-            break;
-        case "castling":
-            sound = new Audio("data/audio/castling.mp3");
-            break;
-        case "capture":
-            sound = new Audio("data/audio/capture.mp3");
-            break;
-        case "check":
-            sound = new Audio("data/audio/check.mp3");
-            break;
-        case "game_over":
-            sound = new Audio("data/audio/game_over.mp3");
-            break;
-    }
-    sound.play();
+    sounds[type].play();
 }
 
 drawBoard();
 putPiecesOnBoard();
+loadSounds();
+
+socketCreate();

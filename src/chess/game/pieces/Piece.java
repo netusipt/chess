@@ -5,7 +5,7 @@ import chess.game.base.Position;
 import chess.game.base.Vector;
 import java.util.ArrayList;
 
-public abstract class Piece {
+public abstract class  Piece {
 
     protected Position position;
     protected String name;
