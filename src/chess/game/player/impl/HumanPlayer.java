@@ -12,10 +12,10 @@ public class HumanPlayer extends Player {
         super(name, color);
     }
 
-    public String move(int pieceInx, int to_x, int to_y) throws InvalidPositionException {
+/*    public String move(int pieceInx, int to_x, int to_y) throws InvalidPositionException {
         Position newPosition = new Position(to_x, to_y);
         this.pieces.get(pieceInx).setPosition(newPosition);
 
         return Move.getNotation(this.pieces.get(pieceInx), newPosition);
-    }
+    }*/
 }

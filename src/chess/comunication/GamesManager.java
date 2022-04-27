@@ -1,5 +1,6 @@
 package chess.comunication;
 
+import chess.comunication.dto.Message;
 import chess.game.Game;
 
 import java.util.HashMap;
@@ -7,6 +8,11 @@ import java.util.HashMap;
 public class GamesManager {
 
     private HashMap<String, GameController> gamesList;
+
+    public void process(Message message) {
+        GameController gameController = gamesList.get(message.getGameId());
+        gameController.process(message);
+    }
 
     public void newGame(String player1Name, String player2Name) {
         Game game = new Game(player1Name, player2Name);

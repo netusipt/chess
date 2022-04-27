@@ -1,9 +1,12 @@
 package chess.game;
 
-import chess.comunication.dto.request.client.game.MoveRequest;
+import chess.game.base.Move;
 import chess.game.pieces.Piece;
-import chess.game.player.Player;
+import chess.game.player.Color;
 import chess.game.rules.Rule;
+import chess.game.rules.impl.CaptureOwnRule;
+import chess.game.rules.impl.InDirectionRule;
+import chess.game.rules.impl.JumpOverRule;
 import chess.game.rules.impl.LimitedBoardRule;
 
 import java.util.ArrayList;
@@ -14,20 +17,17 @@ public class Referee {
 
     private List<Rule> rules;
 
-    private Player player1;
-    private Player player2;
-
-    public Referee(Player player1, Player player2) {
-        this.player1 = player1;
-        this.player2 = player2;
-
+    public Referee() {
         rules.add(new LimitedBoardRule());
+        rules.add(new CaptureOwnRule());
+        rules.add(new InDirectionRule());
+        rules.add(new JumpOverRule());
     }
 
     //TODO: implement
-    public boolean isMovePermitted(MoveRequest move) {
+    public boolean isMovePermitted(Board board, Color playerColor, Move move) {
         for (Rule rule : this.rules) {
-            if(rule.isBroken()) {
+            if(rule.isBroken(board, playerColor, move)) {
                 return false;
             }
         }

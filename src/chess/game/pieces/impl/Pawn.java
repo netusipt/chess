@@ -5,14 +5,16 @@ import chess.game.base.Position;
 import java.util.ArrayList;
 import chess.exceptions.InvalidPositionException;
 import chess.game.pieces.Piece;
+import chess.game.pieces.SurroundPiece;
+import chess.game.player.Color;
 
-public class Pawn extends Piece {
+public class Pawn extends SurroundPiece {
     
-    public Pawn(Position position) throws InvalidPositionException {
-        super(position);
+    public Pawn(Color color) {
+        super(color);
     }
     
-    @Override
+/*    @Override
     public String toString() {
         return "P" + this.position;
     }
@@ -20,6 +22,6 @@ public class Pawn extends Piece {
     @Override
     public ArrayList<Position> getPossibleMoves() throws InvalidPositionException {
         return this.getSurrounding();
-    }
+    }*/
     
 }

@@ -6,12 +6,14 @@ import chess.game.base.Vector;
 import java.util.ArrayList;
 import chess.exceptions.InvalidPositionException;
 import chess.game.pieces.Piece;
+import chess.game.pieces.SurroundPiece;
+import chess.game.player.Color;
 
 
-public class Knight extends Piece {
+public class Knight extends SurroundPiece {
     
-    public Knight(Position position) throws InvalidPositionException {
-        super(position);
+    public Knight(Color color){
+        super(color);
         
         this.surroundVectors.add(new Vector(1, 2));
         this.surroundVectors.add(new Vector(2, 1));
@@ -19,7 +21,7 @@ public class Knight extends Piece {
         this.surroundVectors.add(new Vector(-1, 2));
     }
     
-    @Override
+/*    @Override
     public String toString() {
         return "N" + this.position;
     }
@@ -27,6 +29,6 @@ public class Knight extends Piece {
     @Override
     public ArrayList<Position> getPossibleMoves() throws InvalidPositionException {
         return this.getSurrounding();
-    }
+    }*/
     
 }

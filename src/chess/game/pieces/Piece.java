@@ -3,58 +3,29 @@ package chess.game.pieces;
 import chess.exceptions.InvalidPositionException;
 import chess.game.base.Position;
 import chess.game.base.Vector;
+import chess.game.player.Color;
+
 import java.util.ArrayList;
+import java.util.List;
 
 public abstract class  Piece {
 
-    protected Position position;
     protected String name;
+    protected Color color;
+    protected List<Vector> directions;
 
-    protected ArrayList<Vector> directions;
-    protected ArrayList<Vector> surroundVectors;
-
-    /**
-     *
-     * @param position
-     * @throws InvalidPositionException
-     */
-    public Piece(Position position) throws InvalidPositionException {
-        this.position = position;
+    public Piece(Color color) {
+        this.color = color;
         this.directions = new ArrayList<>();
-        this.surroundVectors = new ArrayList<>(); //TODO: rename
-    }
-    
-    public void setPosition(Position position) throws InvalidPositionException {
-        this.position = position;
     }
 
-    public abstract ArrayList<Position> getPossibleMoves() throws InvalidPositionException;
-
-    protected ArrayList<Position> getVectorPositions() throws InvalidPositionException {
-        ArrayList<Position> positions = new ArrayList<>();
-
-        for (Vector direction : this.directions) {
-            positions.addAll(direction.getLinearCombinations(this.position));
-        }
-
-        return positions;
+    public Color getColor() {
+        return this.color;
     }
 
-    protected ArrayList<Position> getSurrounding() throws InvalidPositionException {
-        ArrayList<Position> positions = new ArrayList<>();
-
-        for (Vector surroundVector : this.surroundVectors) {
-            positions.add(new Position(
-                   this.position.getX() + surroundVector.getX(),
-                   this.position.getY() + surroundVector.getY()
-            ));
-            positions.add(new Position(
-                   this.position.getX() - surroundVector.getX(),
-                   this.position.getY() - surroundVector.getY()
-            ));
-        }
-        
-        return positions;
+    public List<Vector> getDirections() {
+        return this.directions;
     }
 
+    /*public abstract ArrayList<Position> getPossibleMoves() throws InvalidPositionException;*/
 }

@@ -10,8 +10,26 @@
 </head>
 
 <body>
-
     <canvas id="board" width="800px" height="800px"></canvas>
+    <div id="modal-background">
+        <div id="modal">
+            <div class="container">
+                <embed height="80px" src="data/chess_logo.svg" alt="logo">
+                <!-- <h1 class="heading"><img src="data/bp.png" width="30%">Chess</h1> -->
+                <div class="loading_info">
+                    <div class="loading">
+                        <div></div>
+                    </div>
+                    <p>connecting</p>
+                </div>
+
+                <button id="withFriendButton">Play with friend</button><br>
+                <button id="withComputerButton">Play with computer</button>
+
+            </div>
+        </div>
+    </div>
+
     <script src="js/chess.js"></script>
 
 </body>

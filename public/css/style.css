@@ -1,9 +1,142 @@
 #board {
     display: block;
     margin: auto;
-    margin-top: 150px;
-    margin-bottom: 150px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -60%);
     background-color: rgb(238, 238, 210);
     border-radius: 5px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+#modal-background {
+    /* display: none; */
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    backdrop-filter: blur(7px);
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+#modal {
+    width: 250px;
+    height: 450px;
+    position: fixed;
+    padding: 40px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -60%);
+    background-color: rgb(255, 255, 255);
+    border: #565352 solid 0.4px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.5), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.container {
+    text-align: center;
+}
+
+embed {
+    /* center */
+    display: block;
+    margin-left: 25px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+svg {
+    /* center */
+    display: block;
+    margin: auto;
+}
+
+.heading {
+    font-size: 48px;
+    font-weight: bold;
+    font-family: 'Roboto', sans-serif;
+    color: #565352;
+    top: 0px;
+}
+
+img {
+    margin: 0px;
+    padding: 0px;
+}
+
+button {
+    background-color: #8bb363;
+    border-radius: 5px;
+    box-shadow: 0 0.5px 1px 0 rgba(0, 0, 0, 0.2), 0 2px 4px 0 rgba(0, 0, 0, 0.19);
+    padding: 10px 20px;
+    width: 80%;
+    text-decoration: none;
+    font-size: 18px;
+    margin-top: 10px;
+    cursor: pointer;
+    display: none;
+}
+
+#linkInput {
+    width: 80%;
+    font-size: large;
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0 0.5px 1px 0 rgba(0, 0, 0, 0.2), 0 2px 4px 0 rgba(0, 0, 0, 0.19);
+    /* right aline */
+    text-align: right;
+    margin-bottom: 10px;
+}
+
+#copiedInfo {
+    color: #8bb363;
+    font-size: large;
+    font-family: Robot, sans-serif;
+    font-weight: bold;
+}
+
+h2 {
+    font-size: large;
+    font-family: 'Roboto', sans-serif;
+    color: #565352;
+    margin-top: 10px;
+}
+
+p {
+    font-family: 'Roboto', sans-serif;
+}
+
+
+/* loading */
+
+.loading {
+    display: inline-block;
+    position: relative;
+    width: 80px;
+    height: 80px;
+    margin-top: 35px;
+}
+
+.loading div {
+    box-sizing: border-box;
+    position: absolute;
+    display: block;
+    height: 64px;
+    width: 64px;
+    margin: 8px;
+    border: 8px solid #8bb363;
+    border-radius: 60%;
+    border-color: #8bb363 transparent transparent transparent;
+    animation: loading .85s cubic-bezier(.17, .37, .53, .17) infinite;
+}
+
+@keyframes loading {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }

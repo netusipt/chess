@@ -1,17 +1,181 @@
-let canvas = document.querySelector("#board");
-let context = canvas.getContext("2d");
+let linkCopied = false;
 
-const SQ_LEN = canvas.width / 8;
+let connected = false;
+
+let gameId;
+let playerId;
+let color;
 
 let pieces = [];
 let drag = false;
 let focusedPieceId;
+let selectedPieceId;
+
+let highlightedPosition = { x: -1, y: -1 };
 
 let curX;
 let curY;
 
-let firstMove = true;
+//comunication
+let socket;
 
+function connect() {
+    socket = new WebSocket("ws://localhost:8080");
+
+    socket.onopen = () => {
+        displayButtons();
+        connected = true;
+    }
+
+    socket.addEventListener('error', function(event) {
+        console.log('WebSocket error: ', event);
+    });
+
+    socket.onmessage = (e) => {
+        handleMessage(JSON.parse(e.data));
+        console.log(JSON.stringify(JSON.parse(e.data), null, 2));
+    }
+
+    socket.onclose = () => {
+        console.log("connection closed");
+        displayLoading();
+        connect();
+        connected = false;
+    }
+}
+
+function newGame(type) {
+    socket.send(JSON.stringify({
+        messageType: "new_game",
+        gameType: type
+    }));
+}
+
+function handleMessage(message) {
+    switch (message.messageType) {
+        case "game_start":
+            if (gameId == null) {
+                gameId = message.gameId;
+                playerId = message.playerId;
+                color = message.color;
+                if (message.gameType == "friend") {
+                    displayLinkInput(message.playerId);
+                }
+                console.log("game_start");
+            }
+
+            break;
+        case "move_response":
+            if (message.moveStatus == "OK") {
+                playSound("move");
+                highlightPosition(message.move.fromX, message.move.fromY);
+                highlightPosition(message.move.toX, message.move.toY);
+                drawPieces();
+            } else {
+                pieces[message.move.pieceId].posX = message.move.fromX;
+                pieces[message.move.pieceId].posY = message.move.fromY;
+                drawBoard();
+                drawPieces();
+            }
+            break;
+        case "opponent_moved":
+            highlightPosition(pieces[message.pieceId].fromX, pieces[message.pieceId].fromY);
+            pieces[message.pieceId].posX = message.toX;
+            pieces[message.pieceId].posY = message.toY;
+            highlightPosition(toX, toY);
+            drawBoard();
+            drawPieces();
+
+            if (message.check) {
+                playSound("check");
+            } else if (message.castling) {
+                playSound("castling")
+            } else {
+                playSound("move");
+            }
+            break;
+        case "game_over":
+            playSound("game_over");
+            break;
+    }
+}
+
+//menu
+const withFriendButton = document.querySelector("#withFriendButton");
+const withComputerButton = document.querySelector("#withComputerButton");
+const loading = document.querySelector(".loading_info");
+const modal = document.querySelector("#modal-background");
+
+withFriendButton.addEventListener("click", () => {
+    newGame("friend");
+});
+
+withComputerButton.addEventListener("click", () => {
+    newGame("computer");
+    gameStart();
+});
+
+function gameStart() {
+    modal.style.display = "none";
+    playSound("game_start");
+}
+
+function displayLoading() {
+    hideButtons();
+    modal.style.display = "block";
+    loading.style.display = "block";
+}
+
+function displayButtons() {
+    loading.style.display = "none";
+    withFriendButton.style.display = "inline-block";
+    withComputerButton.style.display = "inline-block";
+}
+
+function hideButtons() {
+    withFriendButton.style.display = "none";
+    withComputerButton.style.display = "none";
+}
+
+function displayLinkInput(link) {
+
+    hideButtons();
+    const linkInput = document.createElement("input");
+    linkInput.id = "linkInput"
+    linkInput.type = "text";
+    linkInput.value = "localhost/game/" + gameId;
+    linkInput.readOnly = true;
+
+    const heading = document.createElement("h2");
+    heading.innerHTML = "Send this link to your friend:";
+    let container = document.querySelector("#modal");
+    container.appendChild(heading);
+
+    linkInput.addEventListener("click", () => {
+        linkInput.select();
+
+        if (!linkCopied) {
+
+            document.execCommand("copy");
+            const lable = document.createElement("label");
+            lable.innerHTML = "Link copied!";
+            lable.id = "copiedInfo";
+            container.appendChild(lable);
+
+            console.log("link copied!");
+            linkCopied = true;
+        }
+    });
+
+    container.appendChild(linkInput);
+
+}
+
+//grafics
+const canvas = document.querySelector("#board");
+const context = canvas.getContext("2d");
+
+const SQ_LEN = canvas.width / 8;
 
 function drawBoard() {
     for (let i = 0; i < 8; i++) {
@@ -67,7 +231,7 @@ function putPiecesOnBoard() {
 function createPiece(pieceId, x, y) {
     let pieceImg = new Image();
     pieceImg.src = "data/" + pieceId + ".png";
-    pieces.push({ pieceId: pieceId, pieceImg: pieceImg, posX: x, posY: y, busy: false });
+    pieces.push({ pieceId: pieceId, pieceImg: pieceImg, posX: x, posY: y, fromX: x, fromY: y, busy: false });
 }
 
 function drawPiece(pieceImg, x, y) {
@@ -75,106 +239,24 @@ function drawPiece(pieceImg, x, y) {
         context.drawImage(pieceImg, x, y, SQ_LEN, SQ_LEN);
     }
     context.drawImage(pieceImg, x, y, SQ_LEN, SQ_LEN);
-
 }
 
-canvas.addEventListener("mousedown", function(event) {
-    for (id in pieces) {
-        if (event.offsetX >= pieces[id].posX * SQ_LEN &&
-            event.offsetX <= pieces[id].posX * SQ_LEN + SQ_LEN &&
-            event.offsetY >= pieces[id].posY * SQ_LEN &&
-            event.offsetY <= pieces[id].posY * SQ_LEN + SQ_LEN
-        ) {
-            drag = true;
-            focusedPieceId = id;
-            pieces[id].busy = true;
-        }
-    }
-    drag = true;
-    update();
-});
-
-canvas.addEventListener("mousemove", function(event) {
-    curX = event.offsetX;
-    curY = event.offsetY;
-})
-
-canvas.addEventListener("mouseup", function(event) {
-    pieces[focusedPieceId].posX = Math.round((curX - SQ_LEN / 2) / SQ_LEN);
-    pieces[focusedPieceId].posY = Math.round((curY - SQ_LEN / 2) / SQ_LEN);
-    pieces[focusedPieceId].busy = false;
-    drawBoard();
-    drawPieces();
-    drag = false;
-    if (firstMove) {
-        playSound("game_start");
-        firstMove = false;
-    } else {
-        playSound("move");
-    }
-
-});
-
-function update() {
-    if (drag) {
-        drawBoard();
-        drawPieces();
-        drawPiece(pieces[focusedPieceId].pieceImg, curX - SQ_LEN / 2, curY - SQ_LEN / 2);
-
-        requestAnimationFrame(update);
-    }
-}
-
-function socketCreate() {
-    let socket = new WebSocket("ws://localhost:80");
-
-    socket.addEventListener('error', function(event) {
-        console.log('WebSocket error: ', event);
-    });
-
-    socket.onopen = () => {
-        socket.send("Hello world!");
-    }
-
-    socket.onmessage = (e) => {
-        console.log("message from server", e.data);
-    }
-
-    // setTimeout(() => {
-    //     socket.close();
-    //     console.log("Socket closed!")
-    // }, 3000);
-}
-
-function handleMessage(message) {
-    switch (message.type) {
-        case "game_start":
-            playSound("game_start");
-            break;
-        case "opponent_moved":
-            highlightPosition(pieces[message.pieceId].posX, pieces[message.pieceId].posY);
-            pieces[message.pieceId].posX = message.x;
-            pieces[message.pieceId].posY = message.y;
-            highlightPosition(x, y);
-
-            if (message.check) {
-                playSound("check");
-            } else if (message.castling) {
-                playSound("castling")
-            } else {
-                playSound("move");
-            }
-            break;
-        case "game_over":
-            playSound("game_over");
-            break;
-    }
-}
-
-
-//TODO
 function highlightPosition(x, y) {
+    if ((x + y) % 2 == 0) {
+        context.fillStyle = "rgb(246, 246, 105)";
+    } else {
+        context.fillStyle = "rgb(186, 202, 43)";
+    }
+    context.fillRect(x * SQ_LEN, y * SQ_LEN, SQ_LEN, SQ_LEN);
+}
 
+function unhighlightPosition(x, y) {
+    if ((x + y) % 2 == 0) {
+        context.fillStyle = "rgb(238, 238, 210)";
+    } else {
+        context.fillStyle = "rgb(119, 149, 86)";
+    }
+    context.fillRect(x * SQ_LEN, y * SQ_LEN, SQ_LEN, SQ_LEN);
 }
 
 function markPosibleMoves(posibleMoves) {
@@ -185,9 +267,26 @@ function markPosibleMoves(posibleMoves) {
 
 //TODO
 function markPossibleMove(possition) {
+    context.fillStyle = "rgba(0, 0, 0, 0.1)";
+    context.arc(possition.x * SQ_LEN - (SQ_LEN / 2), possition.y * SQ_LEN - (SQ_LEN / 2), SQ_LEN / 5.5, 0, 2 * Math.PI);
+    context.fill();
+}
+
+
+function update() {
+
+    if (drag) {
+        drawBoard();
+        highlightPosition(pieces[focusedPieceId].fromX, pieces[focusedPieceId].fromY);
+        highlightPosition(pieces[focusedPieceId].posX, pieces[focusedPieceId].posY);
+        drawPieces();
+        drawPiece(pieces[focusedPieceId].pieceImg, curX - SQ_LEN / 2, curY - SQ_LEN / 2);
+        requestAnimationFrame(update);
+    }
 
 }
 
+//sounds
 let sounds = [];
 
 function loadSounds() {
@@ -202,8 +301,80 @@ function playSound(type) {
     sounds[type].play();
 }
 
+//controls
+canvas.addEventListener("mousedown", function(event) {
+    for (id in pieces) {
+        if (event.offsetX >= pieces[id].posX * SQ_LEN &&
+            event.offsetX <= pieces[id].posX * SQ_LEN + SQ_LEN &&
+            event.offsetY >= pieces[id].posY * SQ_LEN &&
+            event.offsetY <= pieces[id].posY * SQ_LEN + SQ_LEN
+        ) {
+            if (pieces[id].pieceId.startsWith(color.charAt(0))) {
+                drag = true;
+                focusedPieceId = id;
+                selectedPieceId = id;
+                pieces[id].busy = true;
+            }
+        }
+    }
+    update();
+});
+
+canvas.addEventListener("mousemove", function(event) {
+    curX = event.offsetX;
+    curY = event.offsetY;
+})
+
+canvas.addEventListener("mouseup", function(event) {
+    if (drag) {
+        pieces[focusedPieceId].posX = Math.round((curX - SQ_LEN / 2) / SQ_LEN);
+        pieces[focusedPieceId].posY = Math.round((curY - SQ_LEN / 2) / SQ_LEN);
+        pieces[focusedPieceId].busy = false;
+        drag = false;
+
+        drawBoard();
+        highlightPosition(pieces[focusedPieceId].fromX, pieces[focusedPieceId].fromY);
+        drawPieces();
+
+
+        //if piece is moved
+        if (pieces[focusedPieceId].posX != pieces[focusedPieceId].fromX || pieces[focusedPieceId].posY != pieces[focusedPieceId].fromY) {
+
+            socket.send(JSON.stringify({
+                messageType: "move",
+                gameId: gameId,
+                playerId: playerId,
+                move: {
+                    pieceId: focusedPieceId,
+                    fromX: pieces[focusedPieceId].fromX,
+                    fromY: pieces[focusedPieceId].fromY,
+                    toX: pieces[focusedPieceId].posX,
+                    toY: pieces[focusedPieceId].posY
+                }
+            }));
+
+            pieces[focusedPieceId].fromX = pieces[focusedPieceId].posX;
+            pieces[focusedPieceId].fromY = pieces[focusedPieceId].posY;
+
+        } else {
+            if (pieces[focusedPieceId].posX == highlightedPosition.x && pieces[focusedPieceId].posY == highlightedPosition.y) {
+                unhighlightPosition(highlightedPosition.x, highlightedPosition.y);
+                highlightedPosition.x = -1;
+                highlightedPosition.y = -1;
+
+                drawPiece(pieces[focusedPieceId].pieceImg, pieces[focusedPieceId].posX * SQ_LEN, pieces[focusedPieceId].posY * SQ_LEN);
+            } else {
+                highlightedPosition.x = pieces[focusedPieceId].posX;
+                highlightedPosition.y = pieces[focusedPieceId].posY;
+            }
+        }
+    }
+});
+
+
+
+
+connect();
 drawBoard();
 putPiecesOnBoard();
 loadSounds();
-
-socketCreate();

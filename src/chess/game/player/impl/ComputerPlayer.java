@@ -18,13 +18,13 @@ public class ComputerPlayer extends Player {
         this.random = new Random();
     }
 
-    public String move() throws InvalidPositionException {
+/*    public String move() throws InvalidPositionException {
         Piece piece = this.getRandomPiece();
         Position position = getRandomPosition();
         piece.setPosition(position);
 
         return Move.getNotation(piece, position);
-    }
+    }*/
 
     private Piece getRandomPiece() {
         return this.pieces.get(this.random.nextInt() * this.pieces.size());

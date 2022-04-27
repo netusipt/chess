@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 
 import java.lang.reflect.Type;
 
+//TODO: convert from camelCase to snake_case
 public class JsonConverter {
 
     private Gson gson;
@@ -16,7 +17,7 @@ public class JsonConverter {
         return this.gson.toJson(object);
     }
 
-    public Object toObject(String json, Type type) {
+    public <T> T toObject(String json, Type type) {
         return this.gson.fromJson(json, type);
     }
 }
