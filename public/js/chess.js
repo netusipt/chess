@@ -107,6 +107,7 @@ const loading = document.querySelector(".loading_info");
 const modal = document.querySelector("#modal-background");
 
 withFriendButton.addEventListener("click", () => {
+    history.pushState(null, null, "/game/create/friend/" + gameId);
     newGame("friend");
 });
 
@@ -118,6 +119,7 @@ withComputerButton.addEventListener("click", () => {
 function gameStart() {
     modal.style.display = "none";
     playSound("game_start");
+    startGameClock(myClock, myTimeLeft);
 }
 
 function displayLoading() {
@@ -314,6 +316,8 @@ canvas.addEventListener("mousedown", function(event) {
                 focusedPieceId = id;
                 selectedPieceId = id;
                 pieces[id].busy = true;
+                document.body.style.cursor = "grabbing"
+                break;
             }
         }
     }
@@ -321,12 +325,35 @@ canvas.addEventListener("mousedown", function(event) {
 });
 
 canvas.addEventListener("mousemove", function(event) {
+
+    if(drag) {
+        document.body.style.cursor = "grabbing"
+    } else {
+        document.body.style.cursor = "default"
+
+        for (id in pieces) {
+            if (event.offsetX >= pieces[id].posX * SQ_LEN &&
+                event.offsetX <= pieces[id].posX * SQ_LEN + SQ_LEN &&
+                event.offsetY >= pieces[id].posY * SQ_LEN &&
+                event.offsetY <= pieces[id].posY * SQ_LEN + SQ_LEN
+            ) {
+                if (pieces[id].pieceId.startsWith(color.charAt(0))) {
+                    document.body.style.cursor = "pointer";
+                    break;
+                } else {
+    
+                }
+            }
+        }
+    }
+
     curX = event.offsetX;
     curY = event.offsetY;
 })
 
 canvas.addEventListener("mouseup", function(event) {
     if (drag) {
+        document.body.style.cursor = "pointer"
         pieces[focusedPieceId].posX = Math.round((curX - SQ_LEN / 2) / SQ_LEN);
         pieces[focusedPieceId].posY = Math.round((curY - SQ_LEN / 2) / SQ_LEN);
         pieces[focusedPieceId].busy = false;
@@ -372,7 +399,47 @@ canvas.addEventListener("mouseup", function(event) {
 });
 
 
+//chess clock
+let myClock = document.querySelector(".my-clock");
+let enemyClock = document.querySelector(".enemy-clock");
 
+//10 minutes
+let gameLength = 10 * 60;
+
+let myTimeLeft = gameLength;
+let enemyTimeLeft = gameLength;
+
+displayTime(myClock, myTimeLeft);
+displayTime(enemyClock, enemyTimeLeft);
+
+function startGameClock(clock, timeLeft) {
+    setInterval(() => {
+        timeLeft--;
+        if(timeLeft == 0) {
+            socket.send(JSON.stringify({
+                messageType: "time_up",
+                gameId: gameId,
+                playerId: playerId
+            }));
+        }
+        displayTime(clock, timeLeft);
+    }, 1000);
+}
+
+function displayTime(clock, time) { 
+    let minutes = Math.floor(time / 60);
+    let seconds = time % 60;
+    seconds = pad(seconds, "0", 2);
+    minutes = pad(minutes, "&nbsp;&nbsp;", 2);
+
+    clock.innerHTML = minutes + ":" + seconds;
+}
+
+function pad(num, char, size) {
+    num = num.toString();
+    while (num.length < size) num = char + num;
+    return num;
+}
 
 connect();
 drawBoard();
