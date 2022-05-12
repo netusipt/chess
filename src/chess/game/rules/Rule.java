@@ -6,5 +6,7 @@ import chess.game.player.Color;
 
 public interface Rule {
 
-    public boolean isBroken(Board board, Color playerColor, Move move);
+    public boolean isBroken(Board board, Color playerColor, Move move, Color turn);
+
+
 }

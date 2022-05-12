@@ -9,7 +9,7 @@ import chess.game.rules.Rule;
 public class LimitedBoardRule implements Rule {
 
     @Override
-    public boolean isBroken(Board board, Color playerColor, Move move) {
+    public boolean isBroken(Board board, Color playerColor, Move move, Color turn) {
         if(move.getToX() < Position.MIN || move.getToX() > Position.MAX || move.getToY() < Position.MIN || move.getToY() > Position.MAX) {
             return true;
         }

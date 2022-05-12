@@ -13,16 +13,33 @@ public class Message {
         this.playerId = playerId;
     }
 
+    public Message(String playerId, String type) {
+        this.messageType = type;
+        this.playerId = playerId;
+    }
+
     public String getGameId() {
-        return gameId;
+        return this.gameId;
     }
 
     public String getPlayerId() {
-        return playerId;
+        return this.playerId;
     }
 
     public String getMessageType() {
         return this.messageType;
+    }
+
+    public void setGameId(String gameId) {
+        this.gameId = gameId;
+    }
+
+    public void setPlayerId(String playerId) {
+        this.playerId = playerId;
+    }
+
+    public void setMessageType(String messageType) {
+        this.messageType = messageType;
     }
 
 }

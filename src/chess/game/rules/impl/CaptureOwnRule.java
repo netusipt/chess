@@ -9,7 +9,7 @@ import chess.game.rules.Rule;
 public class CaptureOwnRule implements Rule {
 
     @Override
-    public boolean isBroken(Board board, Color playerColor, Move move) {
+    public boolean isBroken(Board board, Color playerColor, Move move, Color turn) {
         Tile tile = board.getTiles()[move.getToY()][move.getToX()];
         if(!tile.isEmpty()) {
             if(tile.getPiece().getColor() == playerColor) {

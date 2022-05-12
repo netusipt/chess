@@ -1,7 +1,10 @@
 package chess.comunication.dto.request.client.pregame;
 
-public final class ConnectRequest {
+import chess.comunication.dto.Message;
 
-    private String link;
-    private String name;
+public final class ConnectRequest extends Message {
+
+    public ConnectRequest(String gameId, String playerId) {
+        super(gameId, playerId, "connect_request");
+    }
 }

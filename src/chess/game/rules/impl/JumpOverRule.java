@@ -2,21 +2,46 @@ package chess.game.rules.impl;
 
 import chess.game.Board;
 import chess.game.base.Move;
+import chess.game.pieces.impl.Knight;
 import chess.game.player.Color;
 import chess.game.rules.Rule;
 
 public class JumpOverRule implements Rule {
 
     @Override
-    public boolean isBroken(Board board, Color playerColor, Move move)
+    public boolean isBroken(Board board, Color playerColor, Move move, Color turn)
     {
-        int y = move.getFromY();
+        int diffX = move.getToX() - move.getFromX();
+        int diffY = move.getToY() - move.getFromY();
+
         int x = move.getFromX();
-        do {
-            if(!board.getTiles()[++y][++x].isEmpty()) {
-                return true;
+        int y = move.getFromY();
+
+        if(!(board.getTiles()[move.getFromY()][move.getFromX()].getPiece() instanceof Knight)) {
+            while(Math.abs(diffX) > 1 || Math.abs(diffY) > 1) {
+                if(diffX < 0) {
+                    x--;
+                    diffX++;
+                } else if(diffX > 0) {
+                    x++;
+                    diffX--;
+                }
+
+                if(diffY < 0) {
+                    y--;
+                    diffY++;
+                } else if(diffY > 0) {
+                    y++;
+                    diffY--;
+                }
+
+                if(!board.getTiles()[y][x].isEmpty()) {
+                    return true;
+                }
+
+     /*       } while(!(Math.abs(x - move.getToX()) <= 1)  || !(Math.abs(y - move.getToY()) <= 1));*/
             }
-        } while (x != move.getToX() - 1);
+        }
 
         return false;
     }

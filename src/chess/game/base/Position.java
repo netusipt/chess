@@ -10,7 +10,7 @@ public class Position {
     private int x;
     private int y;
 
-    public Position(int x, int y) throws InvalidPositionException {
+    public Position(int x, int y) {
         this.setX(x);
         this.setY(y);
 
@@ -30,7 +30,7 @@ public class Position {
         return this.y;
     }
 
-    public void setX(int x) throws InvalidPositionException {
+    public void setX(int x) {
         if (x >= this.MIN && x <= this.MAX) {
             this.x = x;
         } else {
@@ -38,7 +38,7 @@ public class Position {
         }
     }
 
-    public void setY(int y) throws InvalidPositionException {
+    public void setY(int y) {
         if (y >= this.MIN && y <= this.MAX) {
             this.y = y;
         } else {

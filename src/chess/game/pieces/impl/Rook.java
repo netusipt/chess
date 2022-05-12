@@ -13,9 +13,8 @@ import chess.game.player.Color;
 
 public class Rook extends DirectionPiece {
     
-    public Rook(Color color) {
-        super(color);
-        this.name = "rook";
+    public Rook(int id, Color color) {
+        super(id, color, "rook");
         
         this.directions.add(new Vector(1, 0));
         this.directions.add(new Vector(0, 1));

@@ -12,13 +12,17 @@ import chess.game.player.Color;
 
 public class Knight extends SurroundPiece {
     
-    public Knight(Color color){
-        super(color);
+    public Knight(int id, Color color){
+        super(id, color, "knight");
         
         this.surroundVectors.add(new Vector(1, 2));
+        this.surroundVectors.add(new Vector(-1, -2));
         this.surroundVectors.add(new Vector(2, 1));
+        this.surroundVectors.add(new Vector(-2, -1));
         this.surroundVectors.add(new Vector(-2, 1));
+        this.surroundVectors.add(new Vector(2, -1));
         this.surroundVectors.add(new Vector(-1, 2));
+        this.surroundVectors.add(new Vector(1, -2));
     }
     
 /*    @Override

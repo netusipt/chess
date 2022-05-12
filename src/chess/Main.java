@@ -16,13 +16,14 @@ import java.net.InetSocketAddress;
 public class Main {
 
     public static void main(String[] args) {
-        //TODO: triger serverlet on url - set home, set game
+
         JsonConverter jsonConverter = new JsonConverter(new Gson());
         GamesManager gamesManager = new GamesManager();
-        MessageHandler messageHandler = new MessageHandler();
+        MessageHandler messageHandler = new MessageHandler(gamesManager, jsonConverter);
 
         InetSocketAddress socketAddress = new InetSocketAddress(8080);
-        Socket socket = new Socket(socketAddress, jsonConverter, messageHandler, gamesManager);
+        Socket socket = new Socket(socketAddress, messageHandler);
+
         socket.start();
         try {
             HttpServer httpServer = HttpServer.create(new InetSocketAddress(80), 0);

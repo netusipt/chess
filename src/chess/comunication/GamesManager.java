@@ -4,35 +4,51 @@ import chess.comunication.dto.Message;
 import chess.game.Game;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class GamesManager {
 
-    private HashMap<String, GameController> gamesList;
+    private Map<String, GameController> onGoingGames;
+    private Map<String, GameController> unstatedGames;
+
+    public GamesManager() {
+        onGoingGames = new HashMap<>();
+        unstatedGames = new HashMap<>();
+    }
+
+    public Game createGame() {
+        Game game = new Game();
+
+        System.out.println("Game created");
+        GameController gameController = new GameController(game);
+        unstatedGames.put(game.getId(), gameController);
+
+        return game;
+    }
+
+    public void joinGame(String gameId, String playerId, boolean isHuman) {
+        GameController gameController = unstatedGames.get(gameId);
+        unstatedGames.remove(gameId);
+
+        gameController.joinGame(playerId, isHuman);
+        onGoingGames.put(gameId, gameController);
+    }
+
+    public Game getGame(String gameId) {
+        Game game = onGoingGames.get(gameId).getGame();
+        if(game == null) {
+            game = unstatedGames.get(gameId).getGame();
+        }
+        return game;
+    }
 
     public void process(Message message) {
-        GameController gameController = gamesList.get(message.getGameId());
+        GameController gameController = onGoingGames.get(message.getGameId());
         gameController.process(message);
     }
 
-    public void newGame(String player1Name, String player2Name) {
-        Game game = new Game(player1Name, player2Name);
-        GameController gameController = new GameController(game);
-        gamesList.put(this.generateGameId(), gameController);
-    }
-
-    public void newGame(String playerName) {
-        Game game = new Game(playerName);
-        GameController gameController = new GameController(game);
-        gamesList.put(this.generateGameId(), gameController);
-    }
-
     public void gameEnded(String gameId) {
-        gamesList.remove(gameId);
-    }
-
-    //TODO: implement
-    private String generateGameId() {
-        return "";
+        onGoingGames.remove(gameId);
     }
 
 

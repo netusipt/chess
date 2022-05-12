@@ -12,8 +12,8 @@ import chess.game.player.Color;
 
 public class Queen extends DirectionPiece {
     
-    public Queen(Color color) {
-        super(color);
+    public Queen(int id, Color color) {
+        super(id, color, "queen");
         
         this.directions.add(new Vector(1, 0));
         this.directions.add(new Vector(0, 1));

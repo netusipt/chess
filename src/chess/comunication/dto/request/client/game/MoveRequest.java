@@ -7,10 +7,6 @@ public class MoveRequest extends Message {
 
     private Move move;
 
-    private int pieceId;
-    private int posX;
-    private int posY;
-
     public MoveRequest(String gameId, String playerId, Move move) {
         super(gameId, playerId, "move_request");
         this.move = move;

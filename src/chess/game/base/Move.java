@@ -2,8 +2,12 @@
 package chess.game.base;
 
 import chess.game.pieces.Piece;
+import chess.game.trigger.FLAG;
 
-public class Move {
+import java.util.ArrayList;
+import java.util.List;
+
+public class  Move {
 
     private String playerId;
     private int pieceId;
@@ -11,6 +15,7 @@ public class Move {
     private int fromY;
     private int toX;
     private int toY;
+    private List<FLAG> flags;
 
     public Move(String playerId, int pieceId, int fromX, int fromY, int toX, int toY) {
         this.playerId = playerId;
@@ -19,10 +24,15 @@ public class Move {
         this.fromY = fromY;
         this.toX = toX;
         this.toY = toY;
+        this.flags = new ArrayList<>();
     }
     
     public static String getNotation(Piece piece, Position toPosition) {
         return "";
+    }
+
+    public String getPlayerId() {
+        return this.playerId;
     }
 
     public int getPieceId() {
@@ -63,5 +73,21 @@ public class Move {
 
     public void setToY(int toY) {
         this.toY = toY;
+    }
+
+    public String[] getFlags() {
+        String[] flagNames = new String[this.flags.size()];
+        for (int i = 0; i < this.flags.size(); i++) {
+            flagNames[i] = this.flags.get(i).name();
+        }
+        return flagNames;
+    }
+
+    public void setFlags(List<FLAG> flags) {
+        this.flags = flags;
+    }
+
+    public void addFlag(FLAG flag) {
+        this.flags.add(flag);
     }
 }

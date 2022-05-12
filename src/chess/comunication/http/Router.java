@@ -14,6 +14,9 @@ public class Router implements HttpHandler {
     private FileLoader fileLoader;
     private ControllerContainer controllerContainer;
 
+    private String prefix;
+    private static final String homePath = "public/chess.html";
+
     public Router(ControllerContainer controllerContainer) {
         fileLoader = new FileLoader();
         this.controllerContainer = controllerContainer;
@@ -22,34 +25,42 @@ public class Router implements HttpHandler {
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
         String response = "";
-        Controller controller;
-
-        switch (httpExchange.getRequestURI().toString()){
-            case "/":
-                controller = this.controllerContainer.get("home");
-                break;
-            case "/game":
-                controller = this.controllerContainer.get("game");
-                break;
-        }
-
 
         switch (httpExchange.getRequestMethod()) {
             case "GET":
                 String request = httpExchange.getRequestURI().toString();
-                System.out.println("GET request");
-                System.out.println(request);
+                String path = request;
 
-                String path = "public" + request;
+                if(request.startsWith("/game")) {
+                    this.prefix= "/game/";
+                    path = this.homePath;
+                    if(request.startsWith(this.prefix + "create/")) {
+                        this.prefix = this.prefix + "create/";
+                        if(request.startsWith(this.prefix + "friend/")) {
+                            this.prefix = this.prefix + "friend/";
+                        } else if(request.startsWith(this.prefix + "computer/")) {
+                            this.prefix = this.prefix + "computer/";
+                        }
+                    } else if(request.startsWith(this.prefix + "join/")) {
+                        this.prefix = this.prefix + "join/";
+                    } else if(request.startsWith(this.prefix + "play/")) {
+                        this.prefix = this.prefix + "play/";
+                    }
+                } else if(request.startsWith("/")) {
+                    this.prefix = "/";
+                    path = this.homePath;
+                }
+
+                if(!request.equals(this.prefix)) { {
+                    path = "public/" + request.substring(this.prefix.length());
+                }}
+
                 File file = new File(path);
 
-                if (request.equals("/")) {
-                    path += "chess.html";
-                    file = new File(path);
-                } else if(!file.exists()) {
-                    path = "public/err/404.html";
-                    file = new File(path);
+                if(!file.exists()) {
+                    file = new File(this.homePath);
                 }
+
 
                 httpExchange.sendResponseHeaders(200, file.length());
                 Files.copy(file.toPath(), httpExchange.getResponseBody());

@@ -12,8 +12,8 @@ import chess.game.player.Color;
 
 public class Bishop extends DirectionPiece {
     
-    public Bishop(Color color) {
-        super(color);
+    public Bishop(int id, Color color) {
+        super(id, color, "bishop");
         
         this.directions.add(new Vector(1, 1));
         this.directions.add(new Vector(-1, 1));

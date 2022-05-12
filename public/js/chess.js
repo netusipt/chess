@@ -1,15 +1,18 @@
 let linkCopied = false;
-
+let possiblePositionsDisplayed = false;
+let possibleMoves = [];
+let positionsPieceId;
 let connected = false;
 
 let gameId;
 let playerId;
-let color;
+let color = "white";
 
 let pieces = [];
 let drag = false;
 let focusedPieceId;
 let selectedPieceId;
+let possiblyCaptured;
 
 let highlightedPosition = { x: -1, y: -1 };
 
@@ -23,6 +26,7 @@ function connect() {
     socket = new WebSocket("ws://localhost:8080");
 
     socket.onopen = () => {
+        manageURL()
         displayButtons();
         connected = true;
     }
@@ -38,6 +42,7 @@ function connect() {
 
     socket.onclose = () => {
         console.log("connection closed");
+        hideLinkInput();
         displayLoading();
         connect();
         connected = false;
@@ -53,23 +58,72 @@ function newGame(type) {
 
 function handleMessage(message) {
     switch (message.messageType) {
+        case "init":
+            // if (localStorage.getItem("playerId") != null) {
+            playerId = message.playerId;
+            localStorage.setItem("playerId", playerId);
+            // } else {
+            //     if (localStorage.getItem("gameId") != null) {
+            //         socket.send(JSON.stringify({
+            //             messageType: "get_game",
+            //             gameId: localStorage.getItem("gameId"),
+            //             playerId: localStorage.getItem("playerId"),
+            //         }));
+            //     }
+            // }
+            break;
         case "game_start":
             if (gameId == null) {
                 gameId = message.gameId;
-                playerId = message.playerId;
-                color = message.color;
+                console.log("game_start");
+            }
+            history.pushState(null, null, "/game/play/" + gameId);
+            gameStart();
+            manageURL();
+            break;
+        case "get_game_response":
+            color = message.color.toLowerCase();
+            history.pushState(null, null, "/game/play/" + gameId);
+            drawBoard();
+            putPiecesOnBoard(message.board.pieces);
+            gameStart();
+            break;
+        case "create_game_response":
+            if (gameId == null) {
+                gameId = message.gameId;
+
                 if (message.gameType == "friend") {
                     displayLinkInput(message.playerId);
                 }
-                console.log("game_start");
+                console.log("game_created");
+                console.log("waiting for opponent...");
             }
-
             break;
         case "move_response":
+            displayTime(myClock, message.whiteTimeLeft);
+            displayTime(enemyClock, message.blackTimeLeft);
+
             if (message.moveStatus == "OK") {
-                playSound("move");
+                if (message.move.flags.includes("CAPTURE")) {
+                    pieces[possiblyCaptured].captured = true;
+                    pieces[possiblyCaptured].posX = -1;
+                    pieces[possiblyCaptured].posY = -1;
+                    drawBoard();
+                    drawPieces();
+                    playSound("capture");
+                } else {
+                    playSound("move");
+                }
+
+                drawBoard();
                 highlightPosition(message.move.fromX, message.move.fromY);
                 highlightPosition(message.move.toX, message.move.toY);
+
+                pieces[message.move.pieceId].fromX = message.move.toX;
+                pieces[message.move.pieceId].fromY = message.move.toY;
+                pieces[message.move.pieceId].posX = message.move.toX;
+                pieces[message.move.pieceId].posY = message.move.toY;
+
                 drawPieces();
             } else {
                 pieces[message.move.pieceId].posX = message.move.fromX;
@@ -77,22 +131,67 @@ function handleMessage(message) {
                 drawBoard();
                 drawPieces();
             }
+
+            possiblePositionsDisplayed = false;
             break;
         case "opponent_moved":
-            highlightPosition(pieces[message.pieceId].fromX, pieces[message.pieceId].fromY);
-            pieces[message.pieceId].posX = message.toX;
-            pieces[message.pieceId].posY = message.toY;
-            highlightPosition(toX, toY);
-            drawBoard();
-            drawPieces();
+            displayTime(myClock, message.whiteTimeLeft);
+            displayTime(enemyClock, message.blackTimeLeft);
 
-            if (message.check) {
-                playSound("check");
-            } else if (message.castling) {
-                playSound("castling")
+            console.log("opponent moved");
+            console.log(message);
+
+
+            if (message.move.flags.includes("CAPTURE")) {
+                pieces[message.move.pieceId].captured = true;
+                pieces[message.move.pieceId].posX = -1;
+                pieces[message.move.pieceId].posY = -1;
+                playSound("capture");
             } else {
                 playSound("move");
             }
+
+            if (message.move.flags.includes("PROMOTE")) {
+                pieces[message.move.pieceId].pieceId = color.substring(0, 1) + "q";
+                pieces[message.move.pieceId].pieceImg.src = "data/" + pieces[message.move.pieceId].pieceId + ".png";
+            }
+
+            drawBoard();
+            highlightPosition(message.move.fromX, message.move.fromY);
+            highlightPosition(message.move.toX, message.move.toY);
+
+            pieces[message.move.pieceId].fromX = message.move.toX;
+            pieces[message.move.pieceId].fromY = message.move.toY;
+            pieces[message.move.pieceId].posX = message.move.toX;
+            pieces[message.move.pieceId].posY = message.move.toY;
+
+            console.log(pieces);
+            drawPieces();
+            //drawPiece(pieces[message.move.pieceId].pieceImg, pieces[message.move.pieceId].posX * SQ_LEN, pieces[message.move.pieceId].posY * SQ_LEN);
+
+            // if (message.check) {
+            //     playSound("check");
+            // } else if (message.castling) {
+            //     playSound("castling")
+            // } else {
+            //     playSound("move");
+            // }
+            break;
+        case "get_all_possible_moves":
+            if (!possiblePositionsDisplayed || positionsPieceId != focusedPieceId) {
+                drawBoard();
+                possibleMoves = message.moves;
+                markPosibleMoves(message.moves);
+                highlightPosition(pieces[focusedPieceId].fromX, pieces[focusedPieceId].fromY);
+                drawPieces();
+                possiblePositionsDisplayed = true;
+                positionsPieceId = focusedPieceId;
+            } else {
+                drawBoard();
+                drawPieces();
+                possiblePositionsDisplayed = false;
+            }
+
             break;
         case "game_over":
             playSound("game_over");
@@ -107,11 +206,14 @@ const loading = document.querySelector(".loading_info");
 const modal = document.querySelector("#modal-background");
 
 withFriendButton.addEventListener("click", () => {
-    history.pushState(null, null, "/game/create/friend/" + gameId);
+    history.pushState(null, null, "/game/create/friend");
+    manageURL();
     newGame("friend");
 });
 
 withComputerButton.addEventListener("click", () => {
+    history.pushState(null, null, "/game/create/computer");
+    manageURL();
     newGame("computer");
     gameStart();
 });
@@ -119,11 +221,13 @@ withComputerButton.addEventListener("click", () => {
 function gameStart() {
     modal.style.display = "none";
     playSound("game_start");
-    startGameClock(myClock, myTimeLeft);
+    drawBoard();
+    drawPieces();
 }
 
 function displayLoading() {
     hideButtons();
+    //hideLinkInput();
     modal.style.display = "block";
     loading.style.display = "block";
 }
@@ -139,13 +243,16 @@ function hideButtons() {
     withComputerButton.style.display = "none";
 }
 
+let linkInput;
+let heading;
+
 function displayLinkInput(link) {
 
     hideButtons();
-    const linkInput = document.createElement("input");
+    linkInput = document.createElement("input");
     linkInput.id = "linkInput"
     linkInput.type = "text";
-    linkInput.value = "localhost/game/" + gameId;
+    linkInput.value = "localhost/game/join/" + gameId;
     linkInput.readOnly = true;
 
     const heading = document.createElement("h2");
@@ -173,6 +280,11 @@ function displayLinkInput(link) {
 
 }
 
+function hideLinkInput() {
+    linkInput.remove();
+    heading.remove();
+}
+
 //grafics
 const canvas = document.querySelector("#board");
 const context = canvas.getContext("2d");
@@ -194,49 +306,64 @@ function drawBoard() {
 
 function drawPieces() {
     pieces.forEach(piece => {
-        if (piece.busy == false) {
+        if (piece.busy == false && piece.captured == false) {
             drawPiece(piece.pieceImg, piece.posX * SQ_LEN, piece.posY * SQ_LEN);
         }
     });
 }
 
-function putPiecesOnBoard() {
-    createPiece("br", 0, 0);
-    createPiece("bn", 1, 0);
-    createPiece("bb", 2, 0);
-    createPiece("bq", 3, 0);
-    createPiece("bk", 4, 0);
-    createPiece("bb", 5, 0);
-    createPiece("bn", 6, 0);
-    createPiece("br", 7, 0);
+function putPiecesOnBoard(piecesInfo) {
+    drawBoard();
+    pieces = [];
+    count = 0;
 
-    for (let i = 0; i < 8; i++) {
-        createPiece("bp", i, 1);
-    }
+    if (piecesInfo === undefined) {
+        createPiece(count++, "br", 0, 0);
+        createPiece(count++, "bn", 1, 0);
+        createPiece(count++, "bb", 2, 0);
+        createPiece(count++, "bq", 3, 0);
+        createPiece(count++, "bk", 4, 0);
+        createPiece(count++, "bb", 5, 0);
+        createPiece(count++, "bn", 6, 0);
+        createPiece(count++, "br", 7, 0);
 
-    createPiece("wr", 0, 7);
-    createPiece("wn", 1, 7);
-    createPiece("wb", 2, 7);
-    createPiece("wq", 3, 7);
-    createPiece("wk", 4, 7);
-    createPiece("wb", 5, 7);
-    createPiece("wn", 6, 7);
-    createPiece("wr", 7, 7);
+        for (let i = 0; i < 8; i++) {
+            createPiece(count++, "bp", i, 1);
+        }
 
-    for (let i = 0; i < 8; i++) {
-        createPiece("wp", i, 6);
+        createPiece(count++, "wr", 0, 7);
+        createPiece(count++, "wn", 1, 7);
+        createPiece(count++, "wb", 2, 7);
+        createPiece(count++, "wq", 3, 7);
+        createPiece(count++, "wk", 4, 7);
+        createPiece(count++, "wb", 5, 7);
+        createPiece(count++, "wn", 6, 7);
+        createPiece(count++, "wr", 7, 7);
+
+        for (let i = 0; i < 8; i++) {
+            createPiece(count++, "wp", i, 6);
+        }
+    } else {
+        piecesInfo.forEach(piece => {
+            createPiece(piece.id, piece.tag, piece.x, piece.y);
+        });
     }
 
     drawPieces();
 }
 
-function createPiece(pieceId, x, y) {
+function createPiece(id, tag, x, y) {
     let pieceImg = new Image();
-    pieceImg.src = "data/" + pieceId + ".png";
-    pieces.push({ pieceId: pieceId, pieceImg: pieceImg, posX: x, posY: y, fromX: x, fromY: y, busy: false });
+    pieceImg.src = "data/" + tag + ".png";
+    pieces[id] = { pieceId: tag, pieceImg: pieceImg, posX: x, posY: y, fromX: x, fromY: y, busy: false, captured: false };
 }
 
 function drawPiece(pieceImg, x, y) {
+    if (color == "black") {
+        y = 7 * SQ_LEN - y;
+        x = 7 * SQ_LEN - x;
+    }
+
     pieceImg.onload = function() {
         context.drawImage(pieceImg, x, y, SQ_LEN, SQ_LEN);
     }
@@ -244,6 +371,11 @@ function drawPiece(pieceImg, x, y) {
 }
 
 function highlightPosition(x, y) {
+    if (color == "black") {
+        y = 7 - y;
+        x = 7 - x;
+    }
+
     if ((x + y) % 2 == 0) {
         context.fillStyle = "rgb(246, 246, 105)";
     } else {
@@ -252,7 +384,17 @@ function highlightPosition(x, y) {
     context.fillRect(x * SQ_LEN, y * SQ_LEN, SQ_LEN, SQ_LEN);
 }
 
+function highlightCapturePostition(x, y) {
+    context.fillStyle = "rgba(255, 0, 0, 0.3)";
+    context.fillRect(x * SQ_LEN, y * SQ_LEN, SQ_LEN, SQ_LEN);
+}
+
 function unhighlightPosition(x, y) {
+    if (color == "black") {
+        y = 7 - y;
+        x = 7 - x;
+    }
+
     if ((x + y) % 2 == 0) {
         context.fillStyle = "rgb(238, 238, 210)";
     } else {
@@ -267,13 +409,27 @@ function markPosibleMoves(posibleMoves) {
     }
 }
 
-//TODO
-function markPossibleMove(possition) {
-    context.fillStyle = "rgba(0, 0, 0, 0.1)";
-    context.arc(possition.x * SQ_LEN - (SQ_LEN / 2), possition.y * SQ_LEN - (SQ_LEN / 2), SQ_LEN / 5.5, 0, 2 * Math.PI);
-    context.fill();
-}
 
+function markPossibleMove(possition) {
+    let x = possition.toX;
+    let y = possition.toY;
+
+    if (color == "black") {
+        x = 7 - x;
+        y = 7 - y;
+    }
+
+    if (possition.flags.includes("CAPTURE")) {
+        highlightCapturePostition(x, y);
+    } else {
+        context.beginPath();
+        context.fillStyle = "rgba(0, 0, 0, 0.1)";
+        context.arc((x + 1) * SQ_LEN - (SQ_LEN / 2), (y + 1) * SQ_LEN - (SQ_LEN / 2), SQ_LEN / 5.5, 0, 2 * Math.PI);
+        context.fill();
+        context.closePath();
+    }
+
+}
 
 function update() {
 
@@ -294,6 +450,7 @@ let sounds = [];
 function loadSounds() {
     sounds["game_start"] = new Audio("data/audio/game_start.mp3");
     sounds["move"] = new Audio("data/audio/move.mp3");
+    sounds["capture"] = new Audio("data/audio/capture.mp3");
     sounds["castling"] = new Audio("data/audio/castling.mp3");
     sounds["check"] = new Audio("data/audio/check.mp3");
     sounds["game_over"] = new Audio("data/audio/game_over.mp3");
@@ -306,10 +463,18 @@ function playSound(type) {
 //controls
 canvas.addEventListener("mousedown", function(event) {
     for (id in pieces) {
-        if (event.offsetX >= pieces[id].posX * SQ_LEN &&
-            event.offsetX <= pieces[id].posX * SQ_LEN + SQ_LEN &&
-            event.offsetY >= pieces[id].posY * SQ_LEN &&
-            event.offsetY <= pieces[id].posY * SQ_LEN + SQ_LEN
+        let posY = pieces[id].posY;
+        let posX = pieces[id].posX;
+
+        if (color == "black") {
+            posY = 7 - posY;
+            posX = 7 - posX;
+        }
+
+        if (event.offsetX >= posX * SQ_LEN &&
+            event.offsetX <= posX * SQ_LEN + SQ_LEN &&
+            event.offsetY >= posY * SQ_LEN &&
+            event.offsetY <= posY * SQ_LEN + SQ_LEN
         ) {
             if (pieces[id].pieceId.startsWith(color.charAt(0))) {
                 drag = true;
@@ -326,34 +491,75 @@ canvas.addEventListener("mousedown", function(event) {
 
 canvas.addEventListener("mousemove", function(event) {
 
-    if(drag) {
+    if (drag) {
         document.body.style.cursor = "grabbing"
     } else {
         document.body.style.cursor = "default"
 
         for (id in pieces) {
-            if (event.offsetX >= pieces[id].posX * SQ_LEN &&
-                event.offsetX <= pieces[id].posX * SQ_LEN + SQ_LEN &&
-                event.offsetY >= pieces[id].posY * SQ_LEN &&
-                event.offsetY <= pieces[id].posY * SQ_LEN + SQ_LEN
+            let posY = pieces[id].posY;
+            let posX = pieces[id].posX;
+
+            if (color == "black") {
+                posY = 7 - posY;
+                posX = 7 - posX;
+            }
+
+            if (event.offsetX >= posX * SQ_LEN &&
+                event.offsetX <= posX * SQ_LEN + SQ_LEN &&
+                event.offsetY >= posY * SQ_LEN &&
+                event.offsetY <= posY * SQ_LEN + SQ_LEN
             ) {
                 if (pieces[id].pieceId.startsWith(color.charAt(0))) {
                     document.body.style.cursor = "pointer";
                     break;
                 } else {
-    
+
+                }
+            }
+        }
+
+        if (possiblePositionsDisplayed) {
+            for (let i = 0; i < possibleMoves.length; i++) {
+                let y = possibleMoves[i].toY;
+                let x = possibleMoves[i].toX;
+
+                if (color == "black") {
+                    y = 7 - y;
+                    x = 7 - x;
+                }
+                let pos = possibleMoves[i];
+
+                if (event.offsetX >= x * SQ_LEN &&
+                    event.offsetX <= x * SQ_LEN + SQ_LEN &&
+                    event.offsetY >= y * SQ_LEN &&
+                    event.offsetY <= y * SQ_LEN + SQ_LEN
+                ) {
+                    document.body.style.cursor = "pointer";
+                    break;
                 }
             }
         }
     }
 
-    curX = event.offsetX;
-    curY = event.offsetY;
+    if (color == "black") {
+        curY = 8 * SQ_LEN - event.offsetY;
+        curX = 8 * SQ_LEN - event.offsetX;
+    } else {
+        curY = event.offsetY;
+        curX = event.offsetX;
+    }
 })
 
 canvas.addEventListener("mouseup", function(event) {
     if (drag) {
         document.body.style.cursor = "pointer"
+
+        let id;
+        if ((id = getPieceId(Math.round((curX - SQ_LEN / 2) / SQ_LEN), Math.round((curY - SQ_LEN / 2) / SQ_LEN))) != -1) {
+            possiblyCaptured = id;
+        }
+
         pieces[focusedPieceId].posX = Math.round((curX - SQ_LEN / 2) / SQ_LEN);
         pieces[focusedPieceId].posY = Math.round((curY - SQ_LEN / 2) / SQ_LEN);
         pieces[focusedPieceId].busy = false;
@@ -380,19 +586,70 @@ canvas.addEventListener("mouseup", function(event) {
                 }
             }));
 
-            pieces[focusedPieceId].fromX = pieces[focusedPieceId].posX;
-            pieces[focusedPieceId].fromY = pieces[focusedPieceId].posY;
-
         } else {
+            socket.send(JSON.stringify({
+                messageType: "get_all_moves",
+                gameId: gameId,
+                playerId: playerId,
+                piecePosition: {
+                    x: pieces[focusedPieceId].fromX,
+                    y: pieces[focusedPieceId].fromY
+                }
+            }));
+
+
             if (pieces[focusedPieceId].posX == highlightedPosition.x && pieces[focusedPieceId].posY == highlightedPosition.y) {
                 unhighlightPosition(highlightedPosition.x, highlightedPosition.y);
+
                 highlightedPosition.x = -1;
                 highlightedPosition.y = -1;
 
+                drawBoard();
+                drawPieces();
                 drawPiece(pieces[focusedPieceId].pieceImg, pieces[focusedPieceId].posX * SQ_LEN, pieces[focusedPieceId].posY * SQ_LEN);
             } else {
                 highlightedPosition.x = pieces[focusedPieceId].posX;
                 highlightedPosition.y = pieces[focusedPieceId].posY;
+            }
+        }
+    }
+});
+
+canvas.addEventListener("click", function(event) {
+    if (possiblePositionsDisplayed) {
+        let id;
+        if ((id = getPieceId(Math.round((curX - SQ_LEN / 2) / SQ_LEN), Math.round((curY - SQ_LEN / 2) / SQ_LEN))) != -1) {
+            possiblyCaptured = id;
+        }
+
+        for (let i = 0; i < possibleMoves.length; i++) {
+            let y = possibleMoves[i].toY;
+            let x = possibleMoves[i].toX;
+
+            if (color == "black") {
+                y = 7 - y;
+                x = 7 - x;
+            }
+            let pos = possibleMoves[i];
+
+            if (event.offsetX >= x * SQ_LEN &&
+                event.offsetX <= x * SQ_LEN + SQ_LEN &&
+                event.offsetY >= y * SQ_LEN &&
+                event.offsetY <= y * SQ_LEN + SQ_LEN) {
+
+                socket.send(JSON.stringify({
+                    messageType: "move",
+                    gameId: gameId,
+                    playerId: playerId,
+                    move: {
+                        pieceId: focusedPieceId,
+                        fromX: pieces[focusedPieceId].fromX,
+                        fromY: pieces[focusedPieceId].fromY,
+                        toX: pos.toX,
+                        toY: pos.toY
+                    }
+                }));
+                break;
             }
         }
     }
@@ -415,7 +672,7 @@ displayTime(enemyClock, enemyTimeLeft);
 function startGameClock(clock, timeLeft) {
     setInterval(() => {
         timeLeft--;
-        if(timeLeft == 0) {
+        if (timeLeft == 0) {
             socket.send(JSON.stringify({
                 messageType: "time_up",
                 gameId: gameId,
@@ -426,7 +683,7 @@ function startGameClock(clock, timeLeft) {
     }, 1000);
 }
 
-function displayTime(clock, time) { 
+function displayTime(clock, time) {
     let minutes = Math.floor(time / 60);
     let seconds = time % 60;
     seconds = pad(seconds, "0", 2);
@@ -441,7 +698,66 @@ function pad(num, char, size) {
     return num;
 }
 
+//URL
+
+function manageURL() {
+    console.log("manageURL");
+    let path = window.location.pathname;
+    let params = path.split("/");
+
+    switch (params[1]) {
+        case "":
+            console.log("home");
+            modal.style.display = "block";
+            displayButtons();
+        case "game":
+            switch (params[2]) {
+                case "join":
+                    gameId = params[3];
+                    setTimeout(() => {
+                        socket.send(JSON.stringify({
+                            messageType: "join_game",
+                            gameId: params[3],
+                            playerId: playerId
+                        }));
+                    }, 100);
+                    drawBoard();
+                    break;
+                case "create":
+                    console.log(playerId);
+                    socket.send(JSON.stringify({
+                        messageType: "create_game",
+                        gameType: params[3],
+                        playerId: playerId
+                    }));
+                    break;
+                case "play":
+                    socket.send(JSON.stringify({
+                        messageType: "get_game",
+                        gameId: params[3],
+                        playerId: playerId
+                    }));
+                    console.log("get_game_request");
+                    break;
+            }
+            break;
+        default:
+            break;
+    }
+}
+
+addEventListener('popstate', manageURL);
+
+function getPieceId(x, y) {
+    for (let i = 0; i < pieces.length; i++) {
+        if (pieces[i].posX == x && pieces[i].posY == y) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 connect();
 drawBoard();
-putPiecesOnBoard();
+//putPiecesOnBoard();
 loadSounds();

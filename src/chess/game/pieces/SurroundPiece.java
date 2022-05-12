@@ -1,19 +1,22 @@
 package chess.game.pieces;
 
-import chess.exceptions.InvalidPositionException;
-import chess.game.base.Position;
 import chess.game.base.Vector;
 import chess.game.player.Color;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public abstract class SurroundPiece extends Piece {
 
-    protected ArrayList<Vector> surroundVectors;
+    protected List<Vector> surroundVectors;
 
-    public SurroundPiece(Color color) {
-        super(color);
+    public SurroundPiece(int id, Color color, String name) {
+        super(id, color, name);
         this.surroundVectors = new ArrayList<>(); //TODO: rename
+    }
+
+    public List<Vector> getSurroundVectors() {
+        return surroundVectors;
     }
 
 /*    protected ArrayList<Position> getSurrounding() throws InvalidPositionException {

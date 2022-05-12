@@ -7,17 +7,22 @@ import chess.game.player.Color;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public abstract class DirectionPiece extends Piece{
 
-/*    protected ArrayList<Vector> directions;*/
+    protected List<Vector> directions;
 
-    public DirectionPiece(Color color) {
-        super(color);
-        /*this.directions = new ArrayList<>();*/
+    public DirectionPiece(int id, Color color, String name) {
+        super(id, color, name);
+        this.directions = new ArrayList<>();
     }
 
-/*    protected ArrayList<Position> getVectorPositions() throws InvalidPositionException {
+    public List<Vector> getDirections() {
+        return this.directions;
+    }
+
+    /*    protected ArrayList<Position> getVectorPositions() throws InvalidPositionException {
         ArrayList<Position> positions = new ArrayList<>();
 
         for (Vector direction : this.directions) {

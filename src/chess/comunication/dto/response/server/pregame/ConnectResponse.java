@@ -1,7 +1,10 @@
 package chess.comunication.dto.response.server.pregame;
 
-public final class ConnectResponse {
+import chess.comunication.dto.Message;
 
-    private String playerId;
+public final class ConnectResponse extends Message {
 
+    public ConnectResponse(String gameId, String playerId) {
+        super(gameId, playerId, "connect_response");
+    }
 }
