@@ -6,7 +6,14 @@ import chess.game.base.Move;
 import chess.game.player.Color;
 import chess.game.rules.Rule;
 
-public class CaptureOwnRule implements Rule {
+/**
+ * Checks if the move is not a capture of own piece.
+ */
+public class CaptureOwnRule extends Rule {
+
+    public CaptureOwnRule() {
+        super(true);
+    }
 
     @Override
     public boolean isBroken(Board board, Color playerColor, Move move, Color turn) {

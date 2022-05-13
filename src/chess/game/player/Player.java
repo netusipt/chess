@@ -12,14 +12,18 @@ public abstract class Player {
     
     protected String id;
     protected Color color;
-    protected ArrayList<Piece> pieces;
     protected WebSocket connection;
     protected Position kingPosition;
     
     protected Player(String id, Color color) {
         this.id = id;
         this.color = color;
-        this.pieces = new ArrayList<>();
+
+        if(color == Color.WHITE) {
+            this.kingPosition = new Position(4, 7);
+        } else {
+            this.kingPosition = new Position(4, 0);
+        }
     }
 
     public void setConnection(WebSocket connection) {
@@ -37,16 +41,12 @@ public abstract class Player {
     public Color getColor() {
         return this.color;
     }
-    
-    public void addPiece(Piece piece) {
-        this.pieces.add(piece);
-    }
-    
-    public void removePiece(int index) {
-        this.pieces.remove(index);
-    }
 
     public Position getKingPosition() {
         return this.kingPosition;
+    }
+
+    public void setKingPosition(Position position) {
+        this.kingPosition = position;
     }
 }

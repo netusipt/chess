@@ -31,8 +31,8 @@ public class Socket extends WebSocketServer {
     public void onMessage(WebSocket connection, String message) {
         System.out.println(message);
         this.messageHandler.setConnection(connection);
-        String response = this.messageHandler.handle(message);
-        connection.send(response);
+        this.messageHandler.handle(message);
+
     }
 
     @Override

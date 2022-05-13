@@ -11,6 +11,7 @@ public class Clock extends Thread {
     private int initTime;
     private Map<Color, Integer> timeLeft;
     private Color turn;
+    private Color unchangedTurn;
     private boolean switched;
 
     public Clock(int initTime) {
@@ -22,14 +23,11 @@ public class Clock extends Thread {
         switched = false;
     }
 
-    public void switchTurn() {
-        if (this.turn == Color.WHITE) {
-            this.turn = Color.BLACK;
-        } else {
-            this.turn = Color.WHITE;
-        }
+    public void setTurn(Color turn) {
+        this.turn = turn;
         this.switched = true;
     }
+
 
     public int getTimeLeft(Color color) {
         return this.timeLeft.get(color);
@@ -43,11 +41,12 @@ public class Clock extends Thread {
             if(this.switched) {
                 start = LocalDateTime.now();
                 this.initTime = this.timeLeft.get(this.turn);
+                this.unchangedTurn = this.turn;
                 this.switched = false;
             }
 
             LocalDateTime now = LocalDateTime.now();
-            this.timeLeft.put(this.turn, initTime - (int)(now.toEpochSecond(ZoneOffset.UTC) - start.toEpochSecond(ZoneOffset.UTC))) ;
+            this.timeLeft.put(this.unchangedTurn, initTime - (int)(now.toEpochSecond(ZoneOffset.UTC) - start.toEpochSecond(ZoneOffset.UTC))) ;
         }
     }
 }

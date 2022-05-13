@@ -6,7 +6,8 @@ let connected = false;
 
 let gameId;
 let playerId;
-let color = "white";
+let color;
+let turn = "white";
 
 let pieces = [];
 let drag = false;
@@ -86,6 +87,12 @@ function handleMessage(message) {
             history.pushState(null, null, "/game/play/" + gameId);
             drawBoard();
             putPiecesOnBoard(message.board.pieces);
+
+            if (color == "white") {
+                startMyGameClock(gameLength);
+            } else {
+                startEnemyGameClock(gameLength);
+            }
             gameStart();
             break;
         case "create_game_response":
@@ -100,17 +107,36 @@ function handleMessage(message) {
             }
             break;
         case "move_response":
-            displayTime(myClock, message.whiteTimeLeft);
-            displayTime(enemyClock, message.blackTimeLeft);
+            stopMyGameClock();
+            if (color == "white") {
+                displayTime(myClock, message.whiteTimeLeft);
+                startEnemyGameClock(message.blackTimeLeft);
+            } else {
+                displayTime(myClock, message.blackTimeLeft);
+                startEnemyGameClock(message.whiteTimeLeft);
+            }
+
+            console.log(enemyClockInterval);
+
 
             if (message.moveStatus == "OK") {
-                if (message.move.flags.includes("CAPTURE")) {
-                    pieces[possiblyCaptured].captured = true;
-                    pieces[possiblyCaptured].posX = -1;
-                    pieces[possiblyCaptured].posY = -1;
-                    drawBoard();
-                    drawPieces();
-                    playSound("capture");
+
+                if (message.move.flags !== undefined) {
+                    if (message.move.flags.includes("CAPTURE")) {
+                        //EN_PASSANT
+                        pieces[possiblyCaptured].captured = true;
+                        pieces[possiblyCaptured].posX = -1;
+                        pieces[possiblyCaptured].posY = -1;
+                        drawBoard();
+                        drawPieces();
+                        playSound("capture");
+                    } else if (message.move.flags.includes("CASTLE")) {
+                        playSound("castle");
+                    } else {
+                        playSound("move");
+                    }
+
+
                 } else {
                     playSound("move");
                 }
@@ -135,25 +161,47 @@ function handleMessage(message) {
             possiblePositionsDisplayed = false;
             break;
         case "opponent_moved":
-            displayTime(myClock, message.whiteTimeLeft);
-            displayTime(enemyClock, message.blackTimeLeft);
+            stopEnemyGameClock();
+            if (color == "white") {
+                displayTime(enemyClock, message.blackTimeLeft);
+                startMyGameClock(message.whiteTimeLeft);
+            } else {
+                displayTime(enemyClock, message.whiteTimeLeft);
+                startMyGameClock(message.blackTimeLeft);
+            }
 
             console.log("opponent moved");
             console.log(message);
 
+            if (message.move.flags !== undefined) {
 
-            if (message.move.flags.includes("CAPTURE")) {
-                pieces[message.move.pieceId].captured = true;
-                pieces[message.move.pieceId].posX = -1;
-                pieces[message.move.pieceId].posY = -1;
-                playSound("capture");
-            } else {
-                playSound("move");
-            }
+                if (message.move.flags.includes("EN_PASSANT")) {
+                    if (color == "white") {
+                        capturedId = getPieceId(message.move.toX, message.move.toY + 1);
+                    } else {
+                        capturedId = getPieceId(message.move.toX, message.move.toY - 1);
+                    }
+                    pieces[captruedId].captured = true;
+                    pieces[captruedId].posX = -1;
+                    pieces[captruedId].posY = -1;
+                    playSound("capture");
+                }
 
-            if (message.move.flags.includes("PROMOTE")) {
-                pieces[message.move.pieceId].pieceId = color.substring(0, 1) + "q";
-                pieces[message.move.pieceId].pieceImg.src = "data/" + pieces[message.move.pieceId].pieceId + ".png";
+                if (message.move.flags.includes("CAPTURE")) {
+                    captruedId = getPieceId(message.move.toX, message.move.toY);
+                    pieces[captruedId].captured = true;
+                    pieces[captruedId].posX = -1;
+                    pieces[captruedId].posY = -1;
+                    playSound("capture");
+                } else {
+                    playSound("move");
+                }
+
+                if (message.move.flags.includes("PROMOTE")) {
+                    pieces[message.move.pieceId].pieceId = color.substring(0, 1) + "q";
+                    pieces[message.move.pieceId].pieceImg.src = "data/" + pieces[message.move.pieceId].pieceId + ".png";
+                }
+
             }
 
             drawBoard();
@@ -660,6 +708,9 @@ canvas.addEventListener("click", function(event) {
 let myClock = document.querySelector(".my-clock");
 let enemyClock = document.querySelector(".enemy-clock");
 
+let myClockInterval;
+let enemyClockInterval;
+
 //10 minutes
 let gameLength = 10 * 60;
 
@@ -669,18 +720,38 @@ let enemyTimeLeft = gameLength;
 displayTime(myClock, myTimeLeft);
 displayTime(enemyClock, enemyTimeLeft);
 
-function startGameClock(clock, timeLeft) {
-    setInterval(() => {
+function startMyGameClock(timeLeft) {
+    if (myClockInterval) {
+        clearInterval(myClockInterval);
+        console.log(myClockInterval);
+    }
+    myClockInterval = setInterval(() => {
         timeLeft--;
         if (timeLeft == 0) {
-            socket.send(JSON.stringify({
-                messageType: "time_up",
-                gameId: gameId,
-                playerId: playerId
-            }));
+            alert("You lost!");
+            clearInterval(myClockInterval);
         }
-        displayTime(clock, timeLeft);
+        displayTime(myClock, timeLeft);
     }, 1000);
+}
+
+function stopMyGameClock() {
+    clearInterval(myClockInterval);
+}
+
+function startEnemyGameClock(timeLeft) {
+    enemyClockInterval = setInterval(() => {
+        timeLeft--;
+        if (timeLeft == 0) {
+            alert("You won!");
+            clearInterval(enemyClockInterval);
+        }
+        displayTime(enemyClock, timeLeft);
+    }, 1000);
+}
+
+function stopEnemyGameClock() {
+    clearInterval(enemyClockInterval);
 }
 
 function displayTime(clock, time) {
@@ -696,6 +767,14 @@ function pad(num, char, size) {
     num = num.toString();
     while (num.length < size) num = char + num;
     return num;
+}
+
+function changeTrun() {
+    if (turn == "white") {
+        turn = "black";
+    } else {
+        turn = "white";
+    }
 }
 
 //URL
@@ -756,6 +835,8 @@ function getPieceId(x, y) {
     }
     return -1;
 }
+
+
 
 connect();
 drawBoard();

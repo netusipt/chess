@@ -13,6 +13,9 @@ import chess.game.trigger.Trigger;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Triggers when move is a castling.
+ */
 public class CastlingTrigger extends Trigger {
 
     public List<Position> castlePositions;

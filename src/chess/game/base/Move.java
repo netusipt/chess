@@ -75,12 +75,8 @@ public class  Move {
         this.toY = toY;
     }
 
-    public String[] getFlags() {
-        String[] flagNames = new String[this.flags.size()];
-        for (int i = 0; i < this.flags.size(); i++) {
-            flagNames[i] = this.flags.get(i).name();
-        }
-        return flagNames;
+    public List<FLAG> getFlags() {
+        return this.flags;
     }
 
     public void setFlags(List<FLAG> flags) {

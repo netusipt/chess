@@ -9,6 +9,10 @@ import chess.game.player.Color;
 import chess.game.trigger.FLAG;
 import chess.game.trigger.Trigger;
 
+
+/**
+ * Triggers when a pawn reaches the end of the board.
+ */
 public class PawnPromotionTrigger extends Trigger {
 
     public PawnPromotionTrigger() {

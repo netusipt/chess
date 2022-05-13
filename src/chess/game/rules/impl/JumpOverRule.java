@@ -6,7 +6,17 @@ import chess.game.pieces.impl.Knight;
 import chess.game.player.Color;
 import chess.game.rules.Rule;
 
-public class JumpOverRule implements Rule {
+import javax.swing.plaf.BorderUIResource;
+
+
+/**
+ * Checks if piece did not jump over other pieces while moving. (Knight is exception)
+ */
+public class JumpOverRule extends Rule {
+
+    public JumpOverRule() {
+        super(true);
+    }
 
     @Override
     public boolean isBroken(Board board, Color playerColor, Move move, Color turn)

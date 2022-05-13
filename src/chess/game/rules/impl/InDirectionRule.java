@@ -9,7 +9,14 @@ import chess.game.pieces.SurroundPiece;
 import chess.game.player.Color;
 import chess.game.rules.Rule;
 
-public class InDirectionRule implements Rule {
+/**
+ * Checks if the move is in the direction of the piece direction vector.
+ */
+public class InDirectionRule extends Rule {
+
+    public InDirectionRule() {
+        super(false);
+    }
 
     @Override
     public boolean isBroken(Board board, Color playerColor, Move move, Color turn) {

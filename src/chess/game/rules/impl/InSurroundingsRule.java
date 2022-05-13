@@ -8,7 +8,15 @@ import chess.game.pieces.SurroundPiece;
 import chess.game.player.Color;
 import chess.game.rules.Rule;
 
-public class InSurroundingsRule implements Rule {
+
+/**
+ * checks if the move is in the surroundings of the surround piece
+ */
+public class InSurroundingsRule extends Rule {
+
+    public InSurroundingsRule() {
+        super(false);
+    }
 
     @Override
     public boolean isBroken(Board board, Color playerColor, Move move, Color turn) {

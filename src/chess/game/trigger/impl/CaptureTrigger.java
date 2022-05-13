@@ -10,6 +10,9 @@ import chess.game.player.Color;
 import chess.game.trigger.FLAG;
 import chess.game.trigger.Trigger;
 
+/**
+ * Triggers when move is capture.
+ */
 public class CaptureTrigger extends Trigger {
 
     public CaptureTrigger() {
