@@ -44,7 +44,7 @@ public class GamesManager {
 
     public void process(Message message) {
         GameController gameController = onGoingGames.get(message.getGameId());
-        gameController.process(message);
+
     }
 
     public void gameEnded(String gameId) {

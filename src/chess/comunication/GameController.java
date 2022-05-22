@@ -18,19 +18,8 @@ public class GameController {
         game.setPlayer(playerId, Color.BLACK, isHuman);
     }
 
-    public boolean process(Message message) {
-        switch (message.getMessageType()) {
-            case "move":
-                //Move move = new Move(message.getPlayerId(), message.)
-                //return game.updateBoard()
-                break;
-        }
-        return true;
-    }
-
     public Game getGame() {
         return this.game;
     }
-
 
 }

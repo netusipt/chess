@@ -1,6 +1,5 @@
 package chess.comunication.http;
 
-import chess.comunication.http.controllers.Controller;
 import chess.utils.FileLoader;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -12,14 +11,12 @@ import java.nio.file.Files;
 public class Router implements HttpHandler {
 
     private FileLoader fileLoader;
-    private ControllerContainer controllerContainer;
 
     private String prefix;
     private static final String homePath = "public/chess.html";
 
-    public Router(ControllerContainer controllerContainer) {
+    public Router() {
         fileLoader = new FileLoader();
-        this.controllerContainer = controllerContainer;
     }
 
     @Override
@@ -29,6 +26,7 @@ public class Router implements HttpHandler {
         switch (httpExchange.getRequestMethod()) {
             case "GET":
                 String request = httpExchange.getRequestURI().toString();
+                System.out.println(request);
                 String path = request;
 
                 if(request.startsWith("/game")) {
@@ -59,6 +57,7 @@ public class Router implements HttpHandler {
 
                 if(!file.exists()) {
                     file = new File(this.homePath);
+                    System.out.println(file.getAbsolutePath());
                 }
 
 
