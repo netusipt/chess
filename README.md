@@ -11,7 +11,7 @@ Na domovské stránce si můžete zvolit, zda chcete hrát s počítačem či s 
 
 Jednotliví klienti komunikují se serverem v reálném čase pomocí websoketu. Skrze něj si posílají JSON požadavky. Jak přesně komunikace vypadá můžeme vidět na tomto diagramu.
 
-![API_Diagram](uploads/2bc5885a1968f4ab4375ffb496223f38/API_Diagram.png)
+![API_Diagram](https://user-images.githubusercontent.com/71562948/169720560-64577df9-752a-4d1d-87e9-579e59f4b206.png)
 
 Nejprve hráč odešle požadavek na server "NewGameRequest". Server vygeneruje URL a odešle jí klientovi zpátky v "NewGameResponce". Jakmile protihráč na daný link dorazí, pošle na server "ConnectRequest". V ten moment odešle server "StartGameRequest" obou hráčům. V něm budou informace o barvě daného hráče, která je vybrána náhodně, a počáteční pozice jednotlivých figurek. Pokaždé když nějaký z hráčů odehraje, klient odešle informaci o tahu na server v "MoveRequest". Server odpoví v "MoveResponce", zda je tah validní a pokud ano, odešle "OponnentMovedRequest" soupeři. Tomu se tah zobrazí na obrazovku. Jakmile někdo z hráčů dá soupeři šach-mat, server na to upozorní klienty požadavkem "GameOverRequest". Klienti odpoví "GameOverResponce" na znamení, že byl přijmut. Komunikace končí.
 
@@ -27,7 +27,7 @@ Každá hra je reprezentována instancí třídy game. Hra má dva hráče a roz
 
 Správu právě odehrávajících se her má na starosti GamesManager. Obsahuje Mapu her respektive jejich kontrolerů. Každá hra má své ID, pod kterém je v mapě uložen její kontroler. 
 
-![chess-diagram](uploads/13a04dc8c8f3ffe647911495053d02c9/chess-diagram.png)
+![chess_diagram](https://user-images.githubusercontent.com/71562948/169719885-62791400-da65-4526-9034-857979aa5b55.png)
 
 ## Frontend
 ### Vykreslování
@@ -37,7 +37,7 @@ K vykreslení šachovnice používám HTML element canvas. JavaScriptem postupn�
 ### Animace
 Nastavil jsem posluchače na události "mousedown", "mousemove" a "mouseup". Po Kliknutí na canvas se zavolá funkce update ta překreslí šachovnici, figurky a volá sama sebe, dokud uživatel drzí myš. Umožňuje animaci přesunu figurky po šachovnici. 
 
-![Screenshot_6](uploads/cee915c663f821757d82a42284cf0103/Screenshot_6.png)
+![Screenshot_6](https://user-images.githubusercontent.com/71562948/169719816-8700b950-437e-4467-bb5a-56b2d455dbe4.png)
 
 ## Technologie
 Jak již už bylo řečeno, na pozadí běží Java a na frontendu JavaScript. K serializaci Java objektů do JSON souborů používám knihovnu GSON. Dále využívám java-websocket pro komunikaci serveru s klientem.
