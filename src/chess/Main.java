@@ -3,7 +3,6 @@ package chess;
 import chess.comunication.GamesManager;
 import chess.comunication.MessageHandler;
 import chess.comunication.Socket;
-import chess.comunication.http.ControllerContainer;
 import chess.comunication.http.Router;
 import chess.utils.JsonConverter;
 import com.google.gson.Gson;
@@ -28,7 +27,7 @@ public class Main {
         try {
             HttpServer httpServer = HttpServer.create(new InetSocketAddress(80), 0);
             HttpContext context = httpServer.createContext("/");
-            context.setHandler(new Router(new ControllerContainer()));
+            context.setHandler(new Router());
             httpServer.start();
         } catch (IOException e) {
             e.printStackTrace();

@@ -108,23 +108,6 @@ public class Referee {
         return move;
     }
 
-    //TODO: implement
-/*    public boolean isCheck(Board board, Position kingPosition, String playerId, Color turn) {
-        Piece king = board.getTiles()[kingPosition.getY()][kingPosition.getX()].getPiece();
-
-        for(int i = 0; i < board.getTiles().length; i++) {
-            for(int j = 0; j < board.getTiles()[i].length; j++) {
-                Piece piece = board.getTiles()[i][j].getPiece();
-                if(piece != null && piece.getColor() != king.getColor()) {
-                    Move move = new Move(playerId, piece.getId(), j, i, kingPosition.getX(), kingPosition.getY());
-                    if(this.isMovePermitted(board, piece.getColor(), move, piece.getColor())) { //king.getColor()
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }*/
 
     public boolean isCheck(Board board, String playerId, Position lastMovePosition, Position kingPosition) {
 
@@ -136,14 +119,6 @@ public class Referee {
         }
         return false;
     }
-
-    //TODO: implement
-/*    public boolean isCheckMate(Board board, Position kingPosition) {
-        if(this.getPossibleMoves(board, kingPosition).isEmpty()) {
-            return true;
-        }
-        return false;
-    }*/
 
     /**
      * Gets all possible moves for the given position.
@@ -194,23 +169,4 @@ public class Referee {
         }
         return moves;
     }
-
-/*    public List<Move> setCastlingMoves(Board board, String playerId, King king, List<Move> moves) {
-        if(playerColor == Color.WHITE) {
-
-            Piece possibleRook = board.getTiles()[7][0].getPiece();
-            if(possibleRook instanceof Rook && !possibleRook.isMoved() && !((King) piece).isMoved()) {
-                moves.add(new Move(playerId, king.getId(), king.getPosition().getX(), king.getPosition().getY(), 2, 7));
-            }
-            possibleRook = board.getTiles()[7][7].getPiece();
-            if(possibleRook instanceof Rook && !possibleRook.isMoved() && !((King) piece).isMoved()) {
-                moves.add(new Position(6, 7));
-            }
-        }
-    }*/
-
-
-/*    public boolean isCheckmate(Board board, Position kingPosition) {
-        return false;
-    }*/
 }

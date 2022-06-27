@@ -24,7 +24,7 @@ let curY;
 let socket;
 
 function connect() {
-    socket = new WebSocket("ws://localhost:8080");
+    socket = new WebSocket("ws://188.166.4.209:8080");
 
     socket.onopen = () => {
         manageURL()
@@ -60,18 +60,8 @@ function newGame(type) {
 function handleMessage(message) {
     switch (message.messageType) {
         case "init":
-            // if (localStorage.getItem("playerId") != null) {
             playerId = message.playerId;
             localStorage.setItem("playerId", playerId);
-            // } else {
-            //     if (localStorage.getItem("gameId") != null) {
-            //         socket.send(JSON.stringify({
-            //             messageType: "get_game",
-            //             gameId: localStorage.getItem("gameId"),
-            //             playerId: localStorage.getItem("playerId"),
-            //         }));
-            //     }
-            // }
             break;
         case "game_start":
             if (gameId == null) {
@@ -131,6 +121,7 @@ function handleMessage(message) {
                         drawPieces();
                         playSound("capture");
                     } else if (message.move.flags.includes("CASTLE")) {
+
                         playSound("castle");
                     } else {
                         playSound("move");
@@ -215,15 +206,6 @@ function handleMessage(message) {
 
             console.log(pieces);
             drawPieces();
-            //drawPiece(pieces[message.move.pieceId].pieceImg, pieces[message.move.pieceId].posX * SQ_LEN, pieces[message.move.pieceId].posY * SQ_LEN);
-
-            // if (message.check) {
-            //     playSound("check");
-            // } else if (message.castling) {
-            //     playSound("castling")
-            // } else {
-            //     playSound("move");
-            // }
             break;
         case "get_all_possible_moves":
             if (!possiblePositionsDisplayed || positionsPieceId != focusedPieceId) {
@@ -275,7 +257,6 @@ function gameStart() {
 
 function displayLoading() {
     hideButtons();
-    //hideLinkInput();
     modal.style.display = "block";
     loading.style.display = "block";
 }
@@ -300,7 +281,7 @@ function displayLinkInput(link) {
     linkInput = document.createElement("input");
     linkInput.id = "linkInput"
     linkInput.type = "text";
-    linkInput.value = "localhost/game/join/" + gameId;
+    linkInput.value = "188.166.4.209/game/join/" + gameId;
     linkInput.readOnly = true;
 
     const heading = document.createElement("h2");
@@ -840,5 +821,4 @@ function getPieceId(x, y) {
 
 connect();
 drawBoard();
-//putPiecesOnBoard();
 loadSounds();
